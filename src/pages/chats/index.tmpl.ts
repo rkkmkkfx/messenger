@@ -1,10 +1,8 @@
-import second from './ChatPreview/second.tmpl';
-
-import styles from './Chats.module.css';
+import ChatPreview from './ChatPreview';
 
 export default `
-  {#each arr as arrVal #}
-    ${second}
+  {#each chats as chat #}
+    ${ChatPreview}
   {#each#}
-  <p class=${styles.test}>{{ value }}</p>
-`
+  <p>{{ value }}</p>
+`;
