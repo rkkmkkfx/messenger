@@ -1,13 +1,18 @@
 .root {
+  display: grid;
+  place-items: center;
   height: 48px;
   padding: 0 16px;
   color: var(--primary-contrastTextColor);
   background-color: var(--primary-main);
-  border: none;
+  border: 2px solid var(--primary-main);
   border-radius: 100px;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
+    border-color: var(--primary-dark);
     background-color: var(--primary-dark);
+    text-decoration: none;
   }
 }

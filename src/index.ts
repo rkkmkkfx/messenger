@@ -12,6 +12,6 @@ declare global {
 window.eventHandlers = window.eventHandlers ?? {};
 
 (async () => {
-  const route = window.location.pathname.substr(1);
-  await pageLoader(route.length ? route : 'signin');
+  const route = window.location.pathname.replaceAll('/', '');
+  await pageLoader(route.length ? route : 'home');
 })();

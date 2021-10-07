@@ -1,4 +1,5 @@
 declare module '*.module.pcss' {
-  const content: Record<string, string>;
-  export default content;
+  const classes: { readonly [key: string]: string };
+  export = classes;
+  export default classes;
 }

@@ -1,4 +1,5 @@
 .root {
+  height: max-content;
 }
 
 .input {
@@ -7,10 +8,10 @@
   padding: 16px;
   border-radius: 100px;
   color: var(--surface-dark);
-  border: 1px solid var(--surface-dark);
+  border: 2px solid var(--surface-dark);
   background-color: transparent;
 
-  &:focus {
+  &:focus, &:not(:placeholder-shown) {
     outline: none;
     color: var(--primary-text);
     border-color: var(--primary-main);

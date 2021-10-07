@@ -1,7 +1,11 @@
-import styles from './ChatPreview.module.pcss';
+import * as styles from './ChatPreview.module.pcss';
 
 export default `
-  <a class=${styles.link} href="{{ chat.href }}">
-    {{ chat.title }}
-  </a>
+  <div class="${styles.root}">
+    <img class="${styles.avatar}" src="{{chat.avatar}}" alt="{{chat.title}}">
+    <div>
+      <h3>{{chat.title}}</h3>
+      <span class="${styles.message}">{{chat.last_message.user.first_name}}: {{chat.last_message.content}}</span>
+    </div>
+  </div>
 `;

@@ -1,6 +1,7 @@
 {
   "plugins": {
     "postcss-modules": {
+      "localsConvention": "dashesOnly",
       "generateScopedName": "[name]_[local]__[hash:base64:5]"
     },
     "postcss-nested": {},

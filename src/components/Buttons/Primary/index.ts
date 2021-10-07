@@ -1,1 +1,1 @@
-export { default } from './index.tmpl';
+export { default } from './ButtonPrimary.tmpl';

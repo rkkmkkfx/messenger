@@ -17,6 +17,18 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "indent": "off",
+    "@typescript-eslint/indent": ["error", 2, {
+      "FunctionDeclaration": {
+        "body": 1,
+        "parameters": "first"
+      },
+      "FunctionExpression": {
+        "body": 1,
+        "parameters": 0
+      },
+      "ignoredNodes": ["TSTypeParameterInstantiation"]
+    }],
     "max-len": ["error", {
       "code": 120,
       "ignoreTrailingComments": true,

@@ -1,2 +1,2 @@
-export { default as dataHandler } from './dataHandler';
-export { default } from './index.tmpl';
+export { default as getTemplatesData } from './getTemplatesData';
+export { default } from './SignInPage.tmpl';

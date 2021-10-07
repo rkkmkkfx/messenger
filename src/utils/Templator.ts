@@ -35,11 +35,11 @@ export default class Templator {
         const data = get<typeof ctx>(ctx, tmplValue);
         if (typeof data === 'function') {
           window.eventHandlers[tmplValue] = data;
-          str = str.replace(new RegExp(key[0], 'gi'), `window.eventHandlers.${key[1].trim()}()`);
+          str = str.replace(new RegExp(key[0].trim(), 'gi'), `window.eventHandlers.${key[1].trim()}()`);
           // eslint-disable-next-line no-continue
           continue;
         }
-        str = str.replace(new RegExp(key[0], 'gmi'), `${data}`);
+        str = str.replace(new RegExp(key[0].trim(), 'gmi'), `${data ?? ''}`);
       }
     }
 
@@ -55,7 +55,9 @@ export default class Templator {
       const [part, dataPath, valuePath, inner] = key;
       const tmplValue = dataPath.trim();
       const data = get<typeof ctx>(ctx, tmplValue);
-      console.log(data);
+      if (!data) {
+        str = str.replace(new RegExp(part, 'gmi'), '');
+      }
       const result = this.replaceValue({ [valuePath]: data }, inner);
       str = str.replace(new RegExp(part, 'gmi'), `${result}`);
     }
