@@ -7,6 +7,6 @@ export default async (): Promise<unknown> => ({
     { title: 'Edit Profile Page', href: '/edit-profile' },
     { title: 'Change Password Page', href: '/change-password' },
     { title: '404 Page', href: '/404' },
-    { title: '5** error Page', href: '/error' },
+    { title: '5** error Page', href: '/error?status=500&message=Internal%20server%20error' },
   ],
 });
