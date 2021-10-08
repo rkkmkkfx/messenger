@@ -1,0 +1,20 @@
+{
+  "plugins": {
+    "postcss-modules": {
+      "localsConvention": "dashesOnly",
+      "generateScopedName": "[name]_[local]__[hash:base64:5]"
+    },
+    "postcss-nested": {},
+    "postcss-flexbugs-fixes": {},
+    "autoprefixer": {
+      "flexbox": "no-2009",
+      "grid": "autoplace"
+    },
+    "postcss-preset-env": {
+      "stage": 3,
+      "features": {
+        "custom-properties": false
+      }
+    }
+  }
+}
