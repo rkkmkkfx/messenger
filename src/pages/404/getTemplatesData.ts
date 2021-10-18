@@ -5,6 +5,7 @@ export default async (): Promise<unknown> => {
 
   return {
     url,
+    heading: 'Ooups! It\'s 404',
     buttons: [
       { label: 'Back to the App', href: '/' },
     ],

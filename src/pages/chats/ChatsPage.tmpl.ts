@@ -1,11 +1,7 @@
-import ChatLayout from '../../layouts/ChatLayout';
-
-import ChatPreview from './ChatPreview';
-
-export default ChatLayout({
-  children: `
+export default `
+  {#block ChatLayout #}
     {#each chats as chat #}
-      ${ChatPreview}
+      {#include ChatPreview #}
     {#each#}
-  `,
-});
+  {#block#}
+`;

@@ -1,17 +1,18 @@
-import ChatLayout from '../../layouts/ChatLayout';
+import * as styles from './EditProfile.module.pcss';
 
-import Buttons from '../../components/Buttons';
-
-import FieldsContainer from './FieldsContainer';
-
-export default ChatLayout({
-  children: `
-    ${FieldsContainer}
+export default `
+  {#block ChatLayout #}
+    <div class="${styles.fields}">
+      <h1>Edit profile</h1>
+      {#each inputs as input #}
+        {#include Input #}
+      {#each#}
+    </div>
     {#with buttons.0 as button #}
-      ${Buttons.primary}
+      {#include ButtonPrimary #}
     {#with#}
     {#with buttons.1 as button #}
-      ${Buttons.secondary}
+      {#include ButtonSecondary #}
     {#with#}
-  `,
-});
+  {#block#}
+`;

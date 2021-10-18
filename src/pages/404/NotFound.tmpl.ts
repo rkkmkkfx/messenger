@@ -1,12 +1,8 @@
-import * as styles from './SignInPage.module.pcss';
+import * as styles from './NotFound.module.pcss';
 
 export default `
   {#block Paper #}
-    <div class=${styles.fields}>
-      {#each inputs as input #}
-        {#include Input #}
-      {#each#}
-    </div>
+    <img class=${styles.img} src="{{url}}">
     <div class=${styles.buttons}>
       {#with buttons.0 as button #}
         {#include ButtonPrimary #}

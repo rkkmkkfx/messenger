@@ -1,4 +1,4 @@
-import Templator from './Templator';
+import templator from './Templator';
 
 const App = document.getElementById('app');
 
@@ -15,20 +15,22 @@ export default async function pageLoader(page: string): Promise<void> {
   try {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore ToDo: разобраться с d.ts для glob
-    const { [page]: template } = await import('../pages/*/index.ts');
+    const { [page]: component } = await import('../pages/*/index.ts');
 
-    console.log(page, template);
-
-    if (!template?.default) {
+    if (!component?.default) {
       throw new StatusError(404, 'Page not found');
     }
 
-    const templator = new Templator(template.default);
+    const templateData = component.getTemplatesData ? await component.getTemplatesData() : {};
 
-    const templateData = template.getTemplatesData ? await template.getTemplatesData() : {};
-
-    App?.insertAdjacentHTML('afterbegin', templator.compile(templateData));
+    if (component.default.getContent) {
+      console.log(component.default.getContent());
+      App?.append(component.default.getContent());
+    } else {
+      App?.insertAdjacentHTML('afterbegin', await templator.compile(templateData, component.default));
+    }
   } catch (err) {
+    console.error(err);
     if (err && err instanceof StatusError) {
       if (err.status === 404) {
         window.location.replace('/404');

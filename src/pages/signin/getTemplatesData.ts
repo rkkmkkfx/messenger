@@ -1,4 +1,5 @@
 export default async (): Promise<unknown> => ({
+  heading: 'Sign In',
   inputs: [
     {
       name: 'username',

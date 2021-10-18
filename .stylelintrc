@@ -1,0 +1,17 @@
+{
+  "extends": "stylelint-config-standard",
+  "ignoreFiles": [
+    "dist/*"
+  ],
+  "rules": {
+    "color-hex-case": "lower",
+    "max-nesting-depth": [
+      3,
+      {
+        "ignore": [
+          "pseudo-classes"
+        ]
+      }
+    ]
+  }
+}

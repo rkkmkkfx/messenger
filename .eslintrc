@@ -37,6 +37,7 @@
     }],
     "no-console": "off",
     "no-plusplus": "off",
+    "no-underscore-dangle": "off",
     "no-use-before-define": "off",
     "import/extensions": "off",
 

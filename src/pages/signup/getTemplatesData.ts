@@ -1,4 +1,5 @@
 export default async (): Promise<unknown> => ({
+  heading: 'Create new user',
   inputs: [
     {
       name: 'email',

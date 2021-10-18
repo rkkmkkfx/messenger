@@ -1,17 +1,21 @@
-import ChatLayout from '../../layouts/ChatLayout';
+import * as styles from './Profile.module.pcss';
 
-import Buttons from '../../components/Buttons';
-
-import FieldsContainer from './FieldsContainer';
-
-export default ChatLayout({
-  children: `
-    ${FieldsContainer}
+export default `
+  {#block ChatLayout #}
+    <div class="${styles.fields}">
+      <h1>User profile</h1>
+      <dl>
+        {#each fields as field #}
+          <dt class="${styles.label}">{{field.label}}</dt>
+          <dd class="${styles.value}">{{field.value}}</dd>
+        {#each#}
+      </dl>
+    </div>
     {#with buttons.0 as button #}
-      ${Buttons.primary}
+      {#include ButtonPrimary #}
     {#with#}
     {#with buttons.1 as button #}
-      ${Buttons.secondary}
+      {#include ButtonSecondary #}
     {#with#}
-  `,
-});
+  {#block#}
+`;
