@@ -1,4 +1,4 @@
-import * as styles from './ChangePassword.module.pcss';
+import * as styles from './ChangePasswordPage.module.pcss';
 
 export default `
   {#block ChatLayout #}

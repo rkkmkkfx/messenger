@@ -1,7 +1,7 @@
 import './reset.css';
 import './global.pcss';
 
-import pageLoader from './utils/pageLoader';
+import pageLoader from './core/pageLoader';
 
 import '@fontsource/noto-sans';
 

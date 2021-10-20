@@ -1,4 +1,4 @@
-import * as styles from './Profile.module.pcss';
+import * as styles from './ProfilePage.module.pcss';
 
 export default `
   {#block ChatLayout #}

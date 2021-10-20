@@ -45,8 +45,7 @@ class Templator {
   BLOCK_REGEXP = /{#block (.*) #}\s*?((.|\n)*?)\s*?{#block#}/gmi;
 
   compile<T>(ctx: T, template: string): string {
-    const result = this.compileTemplate(ctx, template);
-    return result;
+    return this.compileTemplate(ctx, template);
   }
 
   protected replaceValue<T>(ctx: T, tmpl: string): string {
@@ -131,8 +130,6 @@ class Templator {
       const part = matches[0];
       const tmplName = matches[1];
       const children = matches[2];
-
-      console.log(tmplName, templates);
 
       const blockTemplate = `${templates[tmplName].default}`;
       const block = blockTemplate.replace(/\s*{{\s*children\s*}}\s*/gmi, children);

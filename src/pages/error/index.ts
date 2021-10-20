@@ -1,2 +1,9 @@
-export { default as getTemplatesData } from './getTemplatesData';
-export { default } from './ErrorPage.tmpl';
+export { default } from './ErrorPage';
+
+export const props = {
+  url: '',
+  message: '',
+  buttons: [
+    { label: 'Back to the App', href: '/' },
+  ],
+};

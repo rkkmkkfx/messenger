@@ -1,2 +1,23 @@
-export { default as getTemplatesData } from './getTemplatesData';
-export { default } from './SignInPage.tmpl';
+export { default } from './SignInPage';
+
+export const props = {
+  heading: 'Sign In',
+  inputs: [
+    {
+      name: 'username',
+      label: 'Username',
+      type: 'text',
+      autocomplete: 'username',
+    },
+    {
+      name: 'password',
+      label: 'Password',
+      type: 'password',
+      autocomplete: 'password',
+    },
+  ],
+  buttons: [
+    { label: 'Sign In', href: '/chats' },
+    { label: 'Sign Up', href: '/signup' },
+  ],
+};

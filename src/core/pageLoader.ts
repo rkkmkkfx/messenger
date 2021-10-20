@@ -1,4 +1,5 @@
-import templator from './Templator';
+import Page from './Page';
+import renderDOM from './renderDOM';
 
 const App = document.getElementById('app');
 
@@ -21,13 +22,9 @@ export default async function pageLoader(page: string): Promise<void> {
       throw new StatusError(404, 'Page not found');
     }
 
-    const templateData = component.getTemplatesData ? await component.getTemplatesData() : {};
-
-    if (component.default.getContent) {
-      console.log(component.default.getContent());
-      App?.append(component.default.getContent());
-    } else {
-      App?.insertAdjacentHTML('afterbegin', await templator.compile(templateData, component.default));
+    const { default: Component, props } = component;
+    if (Component.prototype instanceof Page && App) {
+      renderDOM(App, Component, props);
     }
   } catch (err) {
     console.error(err);

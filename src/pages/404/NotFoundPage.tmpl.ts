@@ -1,4 +1,4 @@
-import * as styles from './NotFound.module.pcss';
+import * as styles from './NotFoundPage.module.pcss';
 
 export default `
   {#block Paper #}

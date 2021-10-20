@@ -1,13 +1,9 @@
-import NotFoundPage from './NotFound';
+export { default } from './NotFoundPage';
 
-const component = new NotFoundPage({
+export const props = {
   url: '',
   heading: 'Ooups! It\'s 404',
   buttons: [
     { label: 'Back to the App', href: '/' },
   ],
-});
-
-console.log(component);
-
-export default component;
+};
