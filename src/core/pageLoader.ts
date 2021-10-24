@@ -28,6 +28,7 @@ export default async function pageLoader(page: string): Promise<void> {
     }
   } catch (err) {
     console.error(err);
+    debugger;
     if (err && err instanceof StatusError) {
       if (err.status === 404) {
         window.location.replace('/404');

@@ -1,9 +1,9 @@
-import Page, { PageProps } from './Page';
+import { PageProps } from './Page';
 
 export default function renderDOM<T extends PageProps>(
-  root: HTMLElement | string,
-  Component: { new(root: HTMLElement | string, props: T): Page<T> },
+  root: HTMLElement,
+  Component: any,
   props: T,
-): Page<T> {
+): void {
   return new Component(root, props);
 }

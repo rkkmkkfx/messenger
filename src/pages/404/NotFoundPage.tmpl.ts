@@ -1,15 +1,11 @@
 import * as styles from './NotFoundPage.module.pcss';
 
 export default `
-  {#block Paper #}
+  <div class="${styles.root}">
+    <h1>{{ heading }}</h1>
     <img class=${styles.img} src="{{url}}">
     <div class=${styles.buttons}>
-      {#with buttons.0 as button #}
-        {#include ButtonPrimary #}
-      {#with#}
-      {#with buttons.1 as button #}
-        {#include ButtonSecondary #}
-      {#with#}
+      {{ button }}
     </div>
-  {#block#}
+  </div>
 `;
