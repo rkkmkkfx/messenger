@@ -5,5 +5,5 @@ export default function renderDOM<T extends PageProps>(
   Component: any,
   props: T,
 ): void {
-  return new Component(root, props);
+  return new Component(props, root);
 }

@@ -41,14 +41,14 @@ export default abstract class Page {
     FLOW_RERENDER: 'flow:rerender',
   };
 
-  protected range: Nullable<Range> = null;
+  _element: Nullable<Node> = null;
 
-  protected _element: Nullable<HTMLElement> = null;
+  dom?: Node;
 
-  private nodes: HTMLElement[] | Text | undefined;
+  readonly range?: Range;
 
-  private readonly meta: {
-    tagOrParent: string | HTMLElement;
+  readonly meta: {
+    root?: Node;
     props: any;
   };
 
@@ -56,7 +56,7 @@ export default abstract class Page {
 
   private readonly eventBus: () => EventBus;
 
-  protected props: any;
+  private props: any;
 
   /* ---- INIT ---- */
   /**
@@ -65,12 +65,14 @@ export default abstract class Page {
    * @param {string | HTMLElement} tagOrParent
    * @param {*} props - Component props
    */
-  constructor(tagOrParent: string | HTMLElement, props: any) {
+  constructor(props: any, root?: Node) {
     const eventBus = new EventBus();
     this.meta = {
-      tagOrParent,
+      root,
       props,
     };
+
+    this.range = this.range ?? new Range();
 
     this.props = this.proxifyProps(props);
 
@@ -100,8 +102,9 @@ export default abstract class Page {
    */
   private proxifyProps(props: any) {
     return new Proxy(props, {
-      get(target: any, prop: string) {
-        if (prop.indexOf('_') === 0) {
+      get(target: any, prop: string | typeof Symbol.toPrimitive) {
+        console.log(prop);
+        if (typeof prop === 'string' && prop.indexOf('_') === 0) {
           throw new Error('Нет прав');
         }
 
@@ -130,14 +133,15 @@ export default abstract class Page {
    * @private
    */
   private createResources() {
-    if (typeof this.meta.tagOrParent === 'string') {
-      this.element = document.createElement(this.meta.tagOrParent);
+    if (!this.meta.root) {
+      this.element = document.createElement('div');
     } else {
-      this.element = this.meta.tagOrParent;
+      this.element = this.meta.root;
     }
-    this.range = document.createRange();
 
-    this.range?.selectNodeContents(this.element!);
+    if (this.range.startContainer instanceof Document) {
+      this.range?.selectNodeContents(this.element!);
+    }
   }
 
   /**
@@ -200,35 +204,32 @@ export default abstract class Page {
 
   getFragment(): DocumentFragment {
     const fragment = new DocumentFragment();
-    console.log(this.nodes);
-    if (Array.isArray(this.nodes)) {
-      this.nodes.forEach((node) => {
-        fragment.append(node);
-      });
-    } else {
-      fragment.append(this.nodes!);
-    }
+    fragment.append(this.dom!);
 
     return fragment;
   }
 
   private _render(): void {
-    this.nodes = templator.compile(this.render(), this.props);
+    this.dom = templator.compile(this.render(), this.props);
+    if (this.props.events) {
+      Object.entries(this.props.events).forEach(([eventType, handler]) => (
+        this.dom?.addEventListener(eventType, handler)
+      ));
+    }
     if (this.range) {
       reloadCss();
       this.range?.deleteContents();
-      const fragment = this.getFragment();
-      this.range?.insertNode(fragment);
+      this.range?.insertNode(this.dom);
     }
   }
 
   abstract render(): string;
 
-  get element(): Nullable<HTMLElement> {
+  get element(): Nullable<Node> {
     return this._element;
   }
 
-  set element(element: Nullable<HTMLElement>) {
+  set element(element: Nullable<Node>) {
     this._element = element;
   }
 }

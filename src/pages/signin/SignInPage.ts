@@ -1,4 +1,3 @@
-import templator from '../../core/Templator';
 import Page from '../../core/Page';
 
 import template from './SignInPage.tmpl';
@@ -9,10 +8,10 @@ type SignInPageProps = {
   buttons: ButtonProps[];
 };
 
-export default class SignInPage extends Page<SignInPageProps> {
+export default class SignInPage extends Page {
   componentDidMount(): SignInPage { return this; }
 
-  render(): string {
-    return templator.compile(this.props, template);
+  render() {
+    return template;
   }
 }

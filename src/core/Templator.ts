@@ -1,10 +1,7 @@
-/* eslint-disable no-cond-assign */
-import EventBus from './EventBus';
-
-type DOMNode = {
+type VirtualDOMNode = {
   tag: string;
   props: NamedNodeMap;
-  children: Nullable<DOMNode>[] | Node | Primitive;
+  children: VirtualDOMNode[] | [string] | [HTMLElement];
 };
 
 function get<T extends Record<string, any>>(
@@ -19,36 +16,10 @@ function get<T extends Record<string, any>>(
 }
 
 class Templator {
-  TAG_REGEXP = /\s*?<(\w+)\s?(.*)>\s*?(.*|\n*)\s*?<\/\1>\s*?/gmi;
-
-  TAG_PROPS_REGEXP = /(\w+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/gmi;
-
   VALUE_REGEXP = /\s*?{{\s*?(.*?)\s*?}}\s*?/gmi;
 
-  WITH_REGEXP = /{#with (.*) as (.*) #}\s*?((.|\n)*?)\s*?{#with#}/gmi;
-
-  EACH_REGEXP = /{#each (.*) as (.*) #}\s*?((.|\n)*?)\s*?{#each#}/gmi;
-
-  eventBus = new EventBus();
-
-  getProps<T>(props: string, ctx: T) {
-    const tagPropsRegexp = this.TAG_PROPS_REGEXP;
-    const matches = [...props.matchAll(new RegExp(tagPropsRegexp))];
-    return matches.reduce((acc: Record<string, string>, [, key, value]) => {
-      acc[key] = this.replaceValue(value, ctx);
-      return acc;
-    }, {});
-  }
-
-  createNode<T>(tag: string, props: string, children: DOMNode['children'], ctx: T): DOMNode {
-    return {
-      tag,
-      props: this.getProps(props, ctx),
-      children,
-    };
-  }
-
-  renderNode({ tag, props, children }: DOMNode): HTMLElement {
+  renderNode(node: VirtualDOMNode): HTMLElement | Text {
+    const { tag, props, children } = node;
     const element = document.createElement(tag);
 
     if (props && Object.keys(props).length) {
@@ -57,46 +28,22 @@ class Templator {
       });
     }
 
-    if (Array.isArray(children)) {
+    if (Array.isArray(children) && children.length > 0) {
       children.forEach((child) => {
-        element.appendChild(this.renderNode(child));
+        if (typeof child === 'string') {
+          element.appendChild(document.createTextNode(child));
+        } else if ((child as HTMLElement).nodeType) {
+          element.appendChild(child as HTMLElement);
+        } else {
+          element.appendChild(this.renderNode(child as VirtualDOMNode));
+        }
       });
-    }
-
-    if ((children as HTMLElement).tagName) {
-      element.appendChild(children as HTMLElement);
-    } else {
-      element.appendChild(document.createTextNode(`${children}`));
     }
 
     return element;
   }
 
-  parseTemplate<T>(tmpl: string, ctx: T): Nullable<DOMNode[]> {
-    const str = tmpl.trim();
-    const tagRegExp = this.TAG_REGEXP;
-
-    const matches = [...str.matchAll(new RegExp(tagRegExp))!];
-
-    console.log(matches, tmpl.trim());
-
-    if (Array.isArray(matches) && matches.length) {
-      return matches.map((match) => {
-        const tag = match[1];
-        const props = match[2];
-        let children: DOMNode[] | Primitive = this.parseTemplate(match[3], ctx) ?? match[3].trim();
-        if (!Array.isArray(children)) {
-          children = this.replaceValue(children, ctx) as Primitive;
-        }
-
-        return this.createNode(tag, props, children, ctx);
-      });
-    }
-
-    return null;
-  }
-
-  compile<T>(template: string, ctx?: T): HTMLElement[] | Text {
+  compile<T>(template: string, ctx?: T): Node {
     return this.compileTemplate(template, ctx) ?? document.createTextNode(template);
   }
 
@@ -110,78 +57,45 @@ class Templator {
     return tmpl;
   }
 
-  protected replaceWith<T>(tmpl: string, ctx?: T): string {
-    let str = tmpl.trim();
-    let key: RegExpExecArray | null = null;
-    const regExp = this.WITH_REGEXP;
-
-    while ((key = regExp.exec(tmpl))) {
-      const [part, dataPath, valuePath, inner] = key;
-      const tmplValue = dataPath.trim();
-      const data = get<T>(tmplValue, ctx);
-      if (!data) {
-        str = str.replace(new RegExp(part, 'gmi'), '');
+  getProps(attributes, ctx) {
+    const props: Record<string, string> = {};
+    if (attributes?.length) {
+      for (let i = 0; i < attributes?.length; i++) {
+        const { name, value } = attributes.item(i);
+        props[name] = this.replaceValue(value, ctx);
       }
-      const result = this.replaceValue(inner, { [valuePath]: data });
-      str = str.replace(new RegExp(part, 'gmi'), `${result}`);
-    }
 
-    return str;
+      return props;
+    }
   }
 
-  protected replaceEach<T>(tmpl: string, ctx: T): string {
-    let str = tmpl.trim();
-    let key: RegExpExecArray | null = null;
-    const regExp = this.EACH_REGEXP;
-
-    while (key = regExp.exec(tmpl)) {
-      const [part, dataPath, valuePath, inner] = key;
-      const tmplValue = dataPath.trim();
-      const data = get<typeof ctx>(tmplValue, ctx);
-      const result = data?.map((item: never) => this.replaceValue(inner, { [valuePath]: item })).join('\n');
-      str = str.replace(new RegExp(part, 'gmi'), `${result}`);
-    }
-
-    return str;
+  getDOM(tmpl: string) {
+    return [...new DOMParser().parseFromString(tmpl, 'application/xhtml+xml').childNodes];
   }
 
-  getProps(attributes) {
-    console.log(attributes?.length);
-    if (attributes) {
-      for (let i = 0; i < attributes?.length - 1; i++) {
-        console.log(attributes.item ? attributes.item(i) : attributes);
+  toVirtualDOM<T>(nodes: NodeListOf<ChildNode>, ctx: T): VirtualDOMNode[] {
+    const result = [];
+    nodes.forEach((node) => {
+      if (node?.nodeType === 1) {
+        result.push({
+          tag: node.tagName.toLowerCase(),
+          props: this.getProps(node.attributes, ctx),
+          children: this.toVirtualDOM(node.childNodes, ctx),
+        });
+        return;
       }
-    }
+      const text = node?.data.replaceAll('\n', '').trim();
+      if (text.length) {
+        result.push(this.replaceValue(text, ctx));
+      }
+    });
+    return result;
   }
 
-  parse(tmpl: string) {
-    return [...new DOMParser().parseFromString(tmpl, 'text/html').body.children];
-  }
-
-  toVDOM(nodes: (Node & { tagName: string, attributes: NamedNodeMap })[]): Nullable<DOMNode>[] {
-    console.log(nodes);
-    if (Array.isArray(nodes)) {
-      return nodes.map((node) => {
-        if (node.nodeType === 1) {
-          return {
-            tag: node.tagName.toLowerCase(),
-            props: node.attributes,
-            children: node.nodeType === 1 ? this.toVDOM([...node.childNodes]) : node,
-          }
-        }
-        return node;
-      });
-    }
-    return nodes;
-  }
-
-  protected compileTemplate<T>(tmpl: string, ctx?: T): HTMLElement[] | undefined {
-    console.log(this.toVDOM(this.parse(tmpl)));
-    const dom = this.parseTemplate(tmpl, ctx);
-    return dom?.map((node) => this.renderNode(node));
-    // tmpl = this.replaceWith(tmpl, ctx);
-    // tmpl = this.replaceEach(tmpl, ctx);
-    // tmpl = this.replaceValue(tmpl, ctx);
+  protected compileTemplate<T>(tmpl: string, ctx?: T): Node | undefined {
+    const [node] = this.toVirtualDOM(this.getDOM(tmpl), ctx);
+    const dom = this.renderNode(node);
+    return dom;
   }
 }
 

@@ -1,11 +1,9 @@
 import * as styles from './SignInPage.module.pcss';
 
 export default `
-  {#block Paper #}
+  <form class="${styles.root}">
     <div class=${styles.fields}>
-      {#each inputs as input #}
-        {#include Input #}
-      {#each#}
+      {{ signInInputs }}
     </div>
     <div class=${styles.buttons}>
       {#with buttons.0 as button #}
@@ -15,5 +13,5 @@ export default `
         {#include ButtonSecondary #}
       {#with#}
     </div>
-  {#block#}
+  </form>
 `;
