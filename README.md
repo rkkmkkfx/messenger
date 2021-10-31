@@ -1,9 +1,9 @@
 # Приложение-чат
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4db40759-a3c1-461a-a673-68c5c93a848d/deploy-status)](https://app.netlify.com/sites/praktikum-messenger-rkkmkkfx/deploys)
 
-## Sprint I
+## Sprint II
 
-#### [Sprint 1 pull-request](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/1)
+#### [Sprint 2 pull-request](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/2)
 
 ### Первый спринт самостоятельного проекта
 
