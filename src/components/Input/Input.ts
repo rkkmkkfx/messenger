@@ -1,13 +1,32 @@
-import Page from '../../core/Page';
+import Component from '../../core/Component';
 
-import templator from '../../core/Templator';
+import * as styles from './Input.module.pcss';
+import { validate } from '../../core/Validator';
 
-import template from './Input.tmpl';
+export type InputProps = {
+  name: string;
+  placeholder: string;
+  type: string;
+  autocomplete: string;
+  events: {
+    [key: string]: EventListenerOrEventListenerObject;
+  };
+};
 
-export default class Input extends Page<InputProps> {
-  componentDidMount() { return this; }
+export default class Input extends Component {
+  constructor(tag: string, props: InputProps) {
+    super(tag, {
+      ...props,
+      className: styles.root,
+      events: {
+        ...props.events,
+        blur: validate,
+        focus: validate,
+      },
+    });
+  }
 
-  render() {
-    return templator.compile(template, this.props);
+  render(): string {
+    return '';
   }
 }

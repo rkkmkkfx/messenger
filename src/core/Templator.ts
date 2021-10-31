@@ -1,116 +1,105 @@
 /* eslint-disable no-cond-assign */
-import EventBus from './EventBus';
 
-type DOMNode = {
+type VirtualDOMNode = {
   tag: string;
-  props: NamedNodeMap;
-  children: Nullable<DOMNode>[] | Node | Primitive;
+  props: Record<string, string>;
+  children: VirtualDOMElement[];
 };
 
-function get<T extends Record<string, any>>(
+type VirtualDOMElement =
+  | HTMLElement
+  | string
+  | VirtualDOMNode;
+
+function get(
   path: string,
-  obj?: T,
+  obj: ComponentProps,
   defaultValue?: unknown,
   delimiter = '.',
 ): any {
   return path
     .split(delimiter)
-    .reduce<typeof obj>((res, key) => res && res[key], obj) ?? defaultValue;
+    .reduce<ComponentProps>((res, key) => res && res[key], obj) ?? defaultValue;
 }
 
 class Templator {
-  TAG_REGEXP = /\s*?<(\w+)\s?(.*)>\s*?(.*|\n*)\s*?<\/\1>\s*?/gmi;
-
-  TAG_PROPS_REGEXP = /(\w+)=["']?((?:.(?!["']?\s+(?:\S+)=|\s*\/?[>"']))+.)["']?/gmi;
-
   VALUE_REGEXP = /\s*?{{\s*?(.*?)\s*?}}\s*?/gmi;
 
   WITH_REGEXP = /{#with (.*) as (.*) #}\s*?((.|\n)*?)\s*?{#with#}/gmi;
 
   EACH_REGEXP = /{#each (.*) as (.*) #}\s*?((.|\n)*?)\s*?{#each#}/gmi;
 
-  eventBus = new EventBus();
-
-  getProps<T>(props: string, ctx: T) {
-    const tagPropsRegexp = this.TAG_PROPS_REGEXP;
-    const matches = [...props.matchAll(new RegExp(tagPropsRegexp))];
-    return matches.reduce((acc: Record<string, string>, [, key, value]) => {
-      acc[key] = this.replaceValue(value, ctx);
-      return acc;
-    }, {});
-  }
-
-  createNode<T>(tag: string, props: string, children: DOMNode['children'], ctx: T): DOMNode {
-    return {
-      tag,
-      props: this.getProps(props, ctx),
-      children,
-    };
-  }
-
-  renderNode({ tag, props, children }: DOMNode): HTMLElement {
+  #renderNode(node: VirtualDOMNode): Node | Text {
+    const { tag, props, children } = node;
     const element = document.createElement(tag);
 
     if (props && Object.keys(props).length) {
       Object.entries(props).forEach(([key, value]) => {
-        element.setAttribute(key, value);
+        if (value) element.setAttribute(key, value);
       });
     }
 
-    if (Array.isArray(children)) {
+    if (Array.isArray(children) && children.length > 0) {
       children.forEach((child) => {
-        element.appendChild(this.renderNode(child));
+        if (typeof child !== 'undefined') {
+          if (typeof child === 'string') {
+            element.appendChild(document.createTextNode(child));
+          } else if (Array.isArray(child)) {
+            const childrenArray = child as (HTMLElement | VirtualDOMNode)[];
+            childrenArray.forEach((item) => {
+              if ((item as HTMLElement).nodeType === 1) {
+                element.appendChild(item as HTMLElement);
+              } else {
+                element.appendChild(this.#renderNode(item as VirtualDOMNode));
+              }
+            });
+          } else if ((child as HTMLElement).nodeType === 1) {
+            element.appendChild(child as HTMLElement);
+          } else {
+            element.appendChild(this.#renderNode(child as VirtualDOMNode));
+          }
+        }
       });
-    }
-
-    if ((children as HTMLElement).tagName) {
-      element.appendChild(children as HTMLElement);
-    } else {
-      element.appendChild(document.createTextNode(`${children}`));
     }
 
     return element;
   }
 
-  parseTemplate<T>(tmpl: string, ctx: T): Nullable<DOMNode[]> {
-    const str = tmpl.trim();
-    const tagRegExp = this.TAG_REGEXP;
-
-    const matches = [...str.matchAll(new RegExp(tagRegExp))!];
-
-    console.log(matches, tmpl.trim());
-
-    if (Array.isArray(matches) && matches.length) {
-      return matches.map((match) => {
-        const tag = match[1];
-        const props = match[2];
-        let children: DOMNode[] | Primitive = this.parseTemplate(match[3], ctx) ?? match[3].trim();
-        if (!Array.isArray(children)) {
-          children = this.replaceValue(children, ctx) as Primitive;
-        }
-
-        return this.createNode(tag, props, children, ctx);
-      });
-    }
-
-    return null;
+  compile(template: string, ctx: ComponentProps): Node[] {
+    return this.#compileTemplate(template, ctx) ?? document.createTextNode(template);
   }
 
-  compile<T>(template: string, ctx?: T): HTMLElement[] | Text {
-    return this.compileTemplate(template, ctx) ?? document.createTextNode(template);
-  }
-
-  protected replaceValue<T>(tmpl: string, ctx?: T): string {
+  #getValuesByTokens(tmpl: string, ctx: ComponentProps): Primitive[] | VirtualDOMElement[] | string[] | string {
     const valueRegExp = this.VALUE_REGEXP;
-    const [match] = [...tmpl.matchAll(valueRegExp)];
-    if (match && match[1]) {
-      const tmplValue = match[1].trim();
-      return get<T>(tmplValue, ctx);
-    }
-    return tmpl;
+    const matches = [...tmpl.matchAll(valueRegExp)];
+    const result = matches.map((match) => {
+      if (match && match[1]) {
+        const tmplValue = match[1].trim();
+        return get(tmplValue, ctx) ?? '';
+      }
+      return undefined;
+    });
+
+    return result.length ? result.flat(Infinity) : tmpl;
   }
 
-  protected replaceWith<T>(tmpl: string, ctx?: T): string {
+  #replaceTokens(tmpl: string, ctx: ComponentProps) {
+    let str = tmpl.trim();
+    let key: RegExpExecArray | null = null;
+    const valueRegExp = this.VALUE_REGEXP;
+
+    while ((key = valueRegExp.exec(tmpl))) {
+      if (key[1]) {
+        const tmplValue = key[1].trim();
+        const data = get(tmplValue, ctx);
+        str = str.replace(new RegExp(key[0].trim(), 'gmi'), `${data ?? ''}`);
+      }
+    }
+
+    return str;
+  }
+
+  #replaceWith(tmpl: string, ctx: ComponentProps): string {
     let str = tmpl.trim();
     let key: RegExpExecArray | null = null;
     const regExp = this.WITH_REGEXP;
@@ -118,18 +107,18 @@ class Templator {
     while ((key = regExp.exec(tmpl))) {
       const [part, dataPath, valuePath, inner] = key;
       const tmplValue = dataPath.trim();
-      const data = get<T>(tmplValue, ctx);
+      const data = get(tmplValue, ctx);
       if (!data) {
         str = str.replace(new RegExp(part, 'gmi'), '');
       }
-      const result = this.replaceValue(inner, { [valuePath]: data });
+      const result = this.#replaceTokens(inner, { [valuePath]: data });
       str = str.replace(new RegExp(part, 'gmi'), `${result}`);
     }
 
     return str;
   }
 
-  protected replaceEach<T>(tmpl: string, ctx: T): string {
+  #replaceEach(tmpl: string, ctx: ComponentProps): string {
     let str = tmpl.trim();
     let key: RegExpExecArray | null = null;
     const regExp = this.EACH_REGEXP;
@@ -137,52 +126,90 @@ class Templator {
     while (key = regExp.exec(tmpl)) {
       const [part, dataPath, valuePath, inner] = key;
       const tmplValue = dataPath.trim();
-      const data = get<typeof ctx>(tmplValue, ctx);
-      const result = data?.map((item: never) => this.replaceValue(inner, { [valuePath]: item })).join('\n');
+      const data = get(tmplValue, ctx);
+      const result = data?.map((item: never) => this.#replaceTokens(inner, { [valuePath]: item })).join('\n');
       str = str.replace(new RegExp(part, 'gmi'), `${result}`);
     }
 
     return str;
   }
 
-  getProps(attributes) {
-    console.log(attributes?.length);
-    if (attributes) {
-      for (let i = 0; i < attributes?.length - 1; i++) {
-        console.log(attributes.item ? attributes.item(i) : attributes);
+  #getProps(attributes: NamedNodeMap, ctx: ComponentProps): Record<string, string> {
+    const props: Record<string, string> = {};
+    if (attributes?.length) {
+      for (let i = 0; i < attributes?.length; i++) {
+        const { name, value } = attributes.item(i)!;
+        const result = this.#getValuesByTokens(value, ctx) as [string] | string;
+        if (Array.isArray(result)) {
+          [props[name]] = result;
+        } else {
+          props[name] = result;
+        }
       }
     }
+    return props;
   }
 
-  parse(tmpl: string) {
-    return [...new DOMParser().parseFromString(tmpl, 'text/html').body.children];
+  static parseDOM(tmpl: string): NodeListOf<ChildNode> {
+    return new DOMParser().parseFromString(tmpl, 'text/html').body.childNodes;
   }
 
-  toVDOM(nodes: (Node & { tagName: string, attributes: NamedNodeMap })[]): Nullable<DOMNode>[] {
-    console.log(nodes);
-    if (Array.isArray(nodes)) {
-      return nodes.map((node) => {
-        if (node.nodeType === 1) {
-          return {
-            tag: node.tagName.toLowerCase(),
-            props: node.attributes,
-            children: node.nodeType === 1 ? this.toVDOM([...node.childNodes]) : node,
+  toVirtualDOM(nodes: NodeListOf<ChildNode | HTMLElement>, ctx: ComponentProps): VirtualDOMElement[] {
+    const vdom: VirtualDOMElement[] = [];
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      if (node?.childNodes?.length) {
+        const item = node as HTMLElement;
+        vdom.push({
+          tag: item.tagName.toLowerCase(),
+          props: this.#getProps(item.attributes, ctx),
+          children: this.toVirtualDOM(node.childNodes, ctx),
+        });
+      } else if (node?.nodeType === 1) {
+        const item = node as HTMLElement;
+        vdom.push({
+          tag: item.tagName.toLowerCase(),
+          props: this.#getProps(item.attributes, ctx),
+          children: [...this.#getValuesByTokens(item.textContent!, ctx) as VirtualDOMElement[]],
+        });
+      } else {
+        const token = node.textContent;
+        if (token?.length) {
+          let values = this.#getValuesByTokens(token, ctx);
+          if (Array.isArray(values) && !values.some((value) => value instanceof HTMLElement)) {
+            values = this.#replaceTokens(token, ctx);
+          }
+
+          if (Array.isArray(values)) {
+            vdom.push(...values as VirtualDOMElement[]);
+          } else if (values.trim().length) {
+            vdom.push(values);
           }
         }
-        return node;
-      });
+      }
     }
-    return nodes;
+
+    return vdom;
   }
 
-  protected compileTemplate<T>(tmpl: string, ctx?: T): HTMLElement[] | undefined {
-    console.log(this.toVDOM(this.parse(tmpl)));
-    const dom = this.parseTemplate(tmpl, ctx);
-    return dom?.map((node) => this.renderNode(node));
-    // tmpl = this.replaceWith(tmpl, ctx);
-    // tmpl = this.replaceEach(tmpl, ctx);
-    // tmpl = this.replaceValue(tmpl, ctx);
+  #compileTemplate(tmpl: string, ctx: ComponentProps): Node[] {
+    let template = tmpl.trim();
+    template = this.#replaceWith(template, ctx);
+    template = this.#replaceEach(template, ctx);
+
+    const nodes = this.toVirtualDOM(Templator.parseDOM(template), ctx);
+    return nodes.map((node) => {
+      if (typeof node === 'string') {
+        return document.createTextNode(node);
+      }
+      if (node instanceof HTMLElement) {
+        return node as HTMLElement;
+      }
+      return this.#renderNode(node as VirtualDOMNode);
+    });
   }
 }
 
-export default new Templator();
+const templator = new Templator();
+
+export default templator;

@@ -1,7 +1,9 @@
+import * as styles from './HomePage.module.pcss';
+
 export default `
-  {#block Paper #}
+  <div class="${styles.root}">
     {#each links as link #}
       <a href="{{link.href}}" target="_blank">{{link.title}}</a>
     {#each#}
-  {#block#}
+  </div>
 `;

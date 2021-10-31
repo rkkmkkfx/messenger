@@ -1,16 +1,19 @@
-import templator from '../../core/Templator';
-import Page from '../../core/Page';
+import Component from '../../core/Component';
+
+import Sidebar from '../../components/Sidebar/Sidebar';
 
 import template from './ProfilePage.tmpl';
+import Chat from '../../components/Chat';
 
-type ProfilePageProps = {
-  url: string;
-  search: InputProps;
-  inputs: InputProps[];
-  buttons: ButtonProps[];
-};
+export default class ProfilePage extends Component {
+  constructor(root: HTMLElement, props: ComponentProps) {
+    super(root, {
+      ...props,
+      sidebar: new Sidebar('aside', props.sidebar).element,
+      chat: new Chat('section', props.chat).element,
+    });
+  }
 
-export default class ProfilePage extends Page<ProfilePageProps> {
   async componentDidMount(): Promise<void> {
     const res = await fetch('https://g.tenor.com/v1/gifs?ids=12136175&key=9FE9RGPBR01S');
     const { results } = await res.json();
@@ -19,6 +22,6 @@ export default class ProfilePage extends Page<ProfilePageProps> {
   }
 
   render(): string {
-    return templator.compile(this.props, template);
+    return template;
   }
 }

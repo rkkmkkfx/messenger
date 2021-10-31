@@ -1,5 +1,4 @@
-import Page from './Page';
-import renderDOM from './renderDOM';
+import Component from './Component';
 
 const App = document.getElementById('app');
 
@@ -12,23 +11,22 @@ class StatusError extends Error {
   }
 }
 
-export default async function pageLoader(page: string): Promise<void> {
+export default async function pageLoader(page: string): Promise<Component | undefined> {
   try {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore ToDo: разобраться с d.ts для glob
     const { [page]: component } = await import('../pages/*/index.ts');
 
     if (!component?.default) {
-      throw new StatusError(404, 'Page not found');
+      throw new StatusError(404, 'Component not found');
     }
 
-    const { default: Component, props } = component;
-    if (Component.prototype instanceof Page && App) {
-      renderDOM(App, Component, props);
+    const { default: Page, props } = component;
+    if (Page.prototype instanceof Component && App) {
+      return new Page(App, props);
     }
   } catch (err) {
     console.error(err);
-    debugger;
     if (err && err instanceof StatusError) {
       if (err.status === 404) {
         window.location.replace('/404');
@@ -39,4 +37,6 @@ export default async function pageLoader(page: string): Promise<void> {
       window.location.replace(`/error?status=500&message=${err.message}`);
     }
   }
+
+  return undefined;
 }

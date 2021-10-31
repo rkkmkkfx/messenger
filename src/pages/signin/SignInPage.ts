@@ -1,18 +1,17 @@
-import templator from '../../core/Templator';
-import Page from '../../core/Page';
+import Component from '../../core/Component';
 
 import template from './SignInPage.tmpl';
+import Form from '../../components/Form/Form';
 
-type SignInPageProps = {
-  heading: string;
-  inputs: InputProps[];
-  buttons: ButtonProps[];
-};
-
-export default class SignInPage extends Page<SignInPageProps> {
-  componentDidMount(): SignInPage { return this; }
+export default class SignInPage extends Component {
+  constructor(root: HTMLElement, props: ComponentProps) {
+    super(root, {
+      ...props,
+      form: new Form('form', props.form).element!,
+    });
+  }
 
   render(): string {
-    return templator.compile(this.props, template);
+    return template;
   }
 }

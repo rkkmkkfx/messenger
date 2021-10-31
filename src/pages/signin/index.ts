@@ -2,22 +2,24 @@ export { default } from './SignInPage';
 
 export const props = {
   heading: 'Sign In',
-  inputs: [
-    {
-      name: 'username',
-      label: 'Username',
-      type: 'text',
-      autocomplete: 'username',
-    },
-    {
-      name: 'password',
-      label: 'Password',
-      type: 'password',
-      autocomplete: 'password',
-    },
-  ],
-  buttons: [
-    { label: 'Sign In', href: '/chats' },
-    { label: 'Sign Up', href: '/signup' },
-  ],
+  form: {
+    inputs: [
+      {
+        name: 'login',
+        placeholder: 'Username',
+        type: 'text',
+        autocomplete: 'username',
+      },
+      {
+        name: 'password',
+        placeholder: 'Password',
+        type: 'password',
+        autocomplete: 'password',
+      },
+    ],
+    buttons: [
+      { child: 'Sign In', variant: 'primary', type: 'submit' },
+      { child: 'Sign Up', variant: 'secondary', to: '/signup' },
+    ],
+  },
 };
