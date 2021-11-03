@@ -1,8 +1,8 @@
-import Paper from '../../modules/Paper';
-import FieldsContainer from './FieldsContainer';
+import * as styles from './SignUpPage.module.pcss';
 
-export default Paper({
-  title: 'Sign Up',
-  children: FieldsContainer,
-  withButtons: true,
-});
+export default `
+  <div class="${styles.root}">
+    <h1 class=${styles.title}>{{heading}}</h1>
+    {{ form }}
+  </div>
+`;

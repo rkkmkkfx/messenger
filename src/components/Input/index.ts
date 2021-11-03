@@ -1,1 +1,2 @@
-export { default } from './Input.tmpl';
+export { default } from './Input';
+export type { InputProps } from './Input';

@@ -1,0 +1,21 @@
+.root {
+  display: grid;
+  grid-gap: 16px;
+  grid-auto-flow: column;
+  grid-auto-columns: 48px 1fr;
+  padding-top: 16px;
+  border-top: 1px solid var(--surface-dark);
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.message {
+  font-size: 12px;
+  color: var(--secondary-text);
+}

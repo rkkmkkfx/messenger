@@ -1,11 +1,8 @@
-import ChatLayout from '../../layouts/ChatLayout';
+import * as styles from './ChatsPage.module.pcss';
 
-import ChatPreview from './ChatPreview';
-
-export default ChatLayout({
-  children: `
-    {#each chats as chat #}
-      ${ChatPreview}
-    {#each#}
-  `,
-});
+export default `
+  <section class="${styles.chatsLayout}">
+    {{ sidebar }}
+    {{ chat }}
+  </section>
+`;

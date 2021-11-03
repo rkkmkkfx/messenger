@@ -19,6 +19,7 @@
   "rules": {
     "indent": "off",
     "@typescript-eslint/indent": ["error", 2, {
+      "SwitchCase": 1,
       "FunctionDeclaration": {
         "body": 1,
         "parameters": "first"
@@ -37,8 +38,10 @@
     }],
     "no-console": "off",
     "no-plusplus": "off",
+    "no-underscore-dangle": "off",
     "no-use-before-define": "off",
     "import/extensions": "off",
+    "class-methods-use-this": "off",
 
     "@typescript-eslint/no-use-before-define": [
       "error"
