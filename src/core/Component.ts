@@ -3,6 +3,7 @@ import templator from './Templator';
 
 import type { ButtonProps } from '../components/Button';
 import type { InputProps } from '../components/Input';
+import { objectsAreEqual } from './utils';
 
 export type ElementProps =
   | ButtonProps
@@ -26,7 +27,7 @@ abstract class Component {
 
   #element?: HTMLElement;
 
-  #children: Node[] | undefined;
+  #children?: Node[];
 
   #meta: {
     tagOrParent: string | HTMLElement;
@@ -35,7 +36,7 @@ abstract class Component {
 
   name = 'Component';
 
-  readonly #eventBus: () => EventBus;
+  readonly #eventBus: EventBus;
 
   protected props: ComponentProps | ElementProps;
 
@@ -47,7 +48,6 @@ abstract class Component {
    * @param {*} props - Component props
    */
   constructor(tagOrParent: string | HTMLElement, props: ComponentProps | ElementProps) {
-    const eventBus = new EventBus();
     this.#meta = {
       tagOrParent,
       props,
@@ -55,10 +55,10 @@ abstract class Component {
 
     this.props = this.#proxifyProps(props);
 
-    this.#eventBus = () => eventBus;
+    this.#eventBus = new EventBus();
 
-    this.#registerEvents(eventBus);
-    eventBus.emit(Component.EVENTS.INIT);
+    this.#registerEvents(this.#eventBus);
+    this.#eventBus.emit(Component.EVENTS.INIT);
   }
 
   /**
@@ -81,7 +81,7 @@ abstract class Component {
    */
   #proxifyProps(props: ComponentProps | ElementProps): typeof props {
     return new Proxy(props, {
-      get(target: ComponentProps, prop: string) {
+      get: (target: ComponentProps, prop: string) => {
         if (prop.startsWith('#')) {
           throw new Error('Нет прав');
         }
@@ -90,18 +90,17 @@ abstract class Component {
         return typeof value === 'function' ? value.bind(target) : value;
       },
       set: (target: ComponentProps, prop: string, value: Primitive) => {
+        const oldProps = { ...target };
         const updated = target;
         if (prop.startsWith('#')) {
           throw new Error('Нет прав');
         }
         if (hasKey(updated, prop)) updated[prop] = value;
-        this.#eventBus().emit(Component.EVENTS.FLOW_CDU, target, updated);
+        this.#eventBus.emit(Component.EVENTS.FLOW_CDU, oldProps, updated);
         return true;
       },
 
-      deleteProperty() {
-        throw new Error('нет доступа');
-      },
+      deleteProperty: () => { throw new Error('нет доступа'); },
     });
   }
 
@@ -135,10 +134,6 @@ abstract class Component {
           this.element?.addEventListener(eventType, handler)
         ));
     }
-
-    if ((this.props as ButtonProps).to) {
-      this.element?.addEventListener('click', () => { window.location.href = (this.props as ButtonProps).to!; });
-    }
   }
 
   /**
@@ -146,7 +141,7 @@ abstract class Component {
    */
   init(): void {
     this.#createResources();
-    this.#eventBus().emit(Component.EVENTS.FLOW_CDM);
+    this.#eventBus.emit(Component.EVENTS.FLOW_CDM);
   }
 
   /* ---- LIFECYCLE ---- */
@@ -156,12 +151,12 @@ abstract class Component {
    */
   #componentDidMount(): void {
     if (this.componentDidMount) this.componentDidMount();
-    this.#eventBus().emit(Component.EVENTS.FLOW_RENDER);
+    this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
   }
 
   // eslint-disable-next-line class-methods-use-this
   shouldUpdate(oldProps: ComponentProps, newProps: ComponentProps): boolean {
-    return Object.is(oldProps, newProps);
+    return !objectsAreEqual(oldProps, newProps);
   }
 
   /**
@@ -174,7 +169,7 @@ abstract class Component {
     const shouldUpdate = this.shouldUpdate(oldProps, newProps);
     if (shouldUpdate) {
       if (this.componentDidUpdate) this.componentDidUpdate(oldProps, newProps);
-      this.#eventBus().emit(Component.EVENTS.FLOW_RENDER);
+      this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
     }
   }
 

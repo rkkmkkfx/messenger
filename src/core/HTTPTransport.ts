@@ -23,9 +23,13 @@ function queryStringify(data: Record<string, unknown>) {
 }
 
 export default class HTTPTransport {
-  get = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => (
-    this.request(url, { ...options, method: Methods.get })
-  );
+  get = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => {
+    let search = '';
+    if (options.data) {
+      search = queryStringify(options.data as unknown as Record<string, unknown>);
+    }
+    return this.request(url + search, { ...options, method: Methods.get });
+  };
 
   post = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => (
     this.request(url, { ...options, method: Methods.post })
@@ -46,16 +50,12 @@ export default class HTTPTransport {
     timeout = 5000,
   }: RequestOptions): Promise<XMLHttpRequest> => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    let search = '';
-    if (method === Methods.get && data) {
-      search = queryStringify(data as unknown as Record<string, unknown>);
-    }
-    xhr.open(method, url + search);
+    xhr.open(method, url);
 
     xhr.timeout = timeout;
 
     if (headers) {
-      Object.entries(headers).map(([header, value]) => xhr.setRequestHeader(header, value));
+      Object.entries(headers).forEach(([header, value]) => xhr.setRequestHeader(header, value));
     }
 
     xhr.onload = () => {

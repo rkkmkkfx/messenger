@@ -17,6 +17,10 @@ export default class Button extends Component {
       ...props,
       className: `${styles.root} ${styles[String(props.variant)]}`,
     });
+
+    if (props.to) {
+      this.element?.addEventListener('click', () => { window.location.href = props.to!; });
+    }
   }
 
   render(): string {

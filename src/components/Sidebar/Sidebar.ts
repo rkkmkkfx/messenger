@@ -10,14 +10,14 @@ import ProfileView from '../ProfileView';
 
 function getContent(props: ComponentProps) {
   switch (props.type) {
-  case 'chats':
-    return props.chats.map((chat: ChatPreviewProps) => new ChatPreview('div', chat).element);
-  case 'profile':
-    return new ProfileView('div', props.profile).element;
-  case 'form':
-    return new Form('form', props.form).element;
-  default:
-    return null;
+    case 'chats':
+      return props.chats.map((chat: ChatPreviewProps) => new ChatPreview('div', chat).element);
+    case 'profile':
+      return new ProfileView('div', props.profile).element;
+    case 'form':
+      return new Form('form', props.form).element;
+    default:
+      return null;
   }
 }
 

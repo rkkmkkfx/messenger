@@ -64,7 +64,7 @@ export default function validateForm(form: HTMLFormElement, cb: () => void): voi
     }
   }
 
-  if (!validity.some((state) => !state)) {
+  if (!validity.some(() => false)) {
     cb();
   }
 }
