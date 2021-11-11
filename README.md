@@ -47,7 +47,7 @@ type VirtualDOMElement =
 и уже из этого VirtualDOM собирается DOM компонента/страницы
 
 *Сделано это было для подключения
-babel-jsx с custom parsing function в дальнейшем.*
+babel-VDom с custom parsing function в дальнейшем.*
 
 ---
 

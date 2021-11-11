@@ -1,11 +1,11 @@
-export default class EventBus {
-  listeners?: Record<string, ((...args: ComponentProps[]) => void)[]>;
+export default class EventBus<Props> {
+  listeners?: Record<string, ((...args: Props[]) => void)[]>;
 
   constructor() {
     this.listeners = {};
   }
 
-  on(event: string, callback: (...args: ComponentProps[]) => void): void {
+  on(event: string, callback: (...args: Props[]) => void): void {
     if (this.listeners) {
       if (!this.listeners[event]) {
         this.listeners[event] = [];
@@ -15,7 +15,7 @@ export default class EventBus {
     }
   }
 
-  off(event: string, callback: (...args: ComponentProps[]) => void): void {
+  off(event: string, callback: (...args: Props[]) => void): void {
     if (this.listeners) {
       if (!this.listeners[event]) {
         throw new Error(`Нет события: ${event}`);
@@ -27,7 +27,7 @@ export default class EventBus {
     }
   }
 
-  emit(event: string, ...args: ComponentProps[]): void {
+  emit(event: string, ...args: Props[]): void {
     if (this.listeners) {
       if (!this.listeners[event]) {
         throw new Error(`Нет события: ${event}`);

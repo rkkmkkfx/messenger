@@ -11,7 +11,7 @@ class StatusError extends Error {
   }
 }
 
-export default async function pageLoader(page: string): Promise<Component | undefined> {
+export default async function pageLoader(page: string): Promise<Component<Record<string, any>> | undefined> {
   try {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore ToDo: разобраться с d.ts для glob
@@ -23,13 +23,14 @@ export default async function pageLoader(page: string): Promise<Component | unde
 
     const { default: Page, props } = component;
     if (Page.prototype instanceof Component && App) {
-      return new Page(App, props);
+      return new Page(props, [], App);
     }
   } catch (err) {
     console.error(err);
+    debugger;
     if (err && err instanceof StatusError) {
       if (err.status === 404) {
-        window.location.replace('/404');
+        window.location.replace('/error?status=404&message="Oops! It\'s 404!"');
       } else {
         window.location.replace(`/error?status=${err.status}&message=${err.message}`);
       }

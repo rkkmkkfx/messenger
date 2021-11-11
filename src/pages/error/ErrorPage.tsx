@@ -1,16 +1,17 @@
+import parseJSX from '../../core/VirtualDOM';
 import Component from '../../core/Component';
 
-import template from './ErrorPage.tmpl';
+import Card from '../../components/Card';
 import Button from '../../components/Button/Button';
 
-export default class ErrorPage extends Component {
-  constructor(root: HTMLElement, props: ComponentProps) {
-    super(root, {
-      ...props,
-      button: new Button('button', props.button).element!,
-    });
-  }
+import * as styles from './ErrorPage.module.pcss';
 
+type ErrorPageProps = {
+  heading: string;
+  url: string;
+};
+
+export default class ErrorPage extends Component<ErrorPageProps> {
   async componentDidMount(): Promise<void> {
     try {
       const params = (new URL(window.location.href)).searchParams;
@@ -28,7 +29,14 @@ export default class ErrorPage extends Component {
     }
   }
 
-  render(): string {
-    return template;
+  render(): JSX.Element {
+    return (
+      <Card heading={this.props.heading}>
+        <img className={styles.img} src={this.props.url} alt="" />
+        <div className={styles.buttons}>
+          <Button variant="primary" to="/">Back to the App</Button>
+        </div>
+      </Card>
+    );
   }
 }

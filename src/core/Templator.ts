@@ -1,15 +1,5 @@
 /* eslint-disable no-cond-assign */
 
-type VirtualDOMNode = {
-  tag: string;
-  props: Record<string, string>;
-  children: VirtualDOMElement[];
-};
-
-type VirtualDOMElement =
-  | HTMLElement
-  | string
-  | VirtualDOMNode;
 
 function get(
   path: string,

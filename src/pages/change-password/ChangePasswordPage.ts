@@ -21,7 +21,7 @@ export default class ChangePasswordPage extends Component {
     this.setProps({ url });
   }
 
-  render(): string {
+  render(): JSX.Element {
     return template;
   }
 }

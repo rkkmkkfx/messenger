@@ -1,5 +1,7 @@
 export const isObject = (value: any): boolean => value != null && typeof value === 'object';
 
+const isArray = (value: any): boolean => Array.isArray(value);
+
 export function objectsAreEqual(first: Record<string, any>, second: Record<string, any>): boolean {
   const firstObjectKeys = Object.keys(first);
   const secondObjectKeys = Object.keys(second);
@@ -13,7 +15,8 @@ export function objectsAreEqual(first: Record<string, any>, second: Record<strin
     const firstValue = first[key];
     const secondValue = second[key];
     const areObjects = isObject(firstValue) && isObject(secondValue);
-    if ((areObjects && !objectsAreEqual(firstValue, secondValue))
+    const areArrays = isArray(firstValue) && isArray(secondValue);
+    if (((areObjects || areArrays) && !objectsAreEqual(firstValue, secondValue))
       || (!areObjects && firstValue !== secondValue)) {
       return false;
     }

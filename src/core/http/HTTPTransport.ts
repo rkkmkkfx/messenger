@@ -23,7 +23,13 @@ function queryStringify(data: Record<string, unknown>) {
 }
 
 export default class HTTPTransport {
-  get = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => {
+  base: string;
+
+  constructor(base = '') {
+    this.base = base;
+  }
+
+  get = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> => {
     let search = '';
     if (options.data) {
       search = queryStringify(options.data as unknown as Record<string, unknown>);
@@ -31,15 +37,15 @@ export default class HTTPTransport {
     return this.request(url + search, { ...options, method: Methods.get });
   };
 
-  post = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => (
-    this.request(url, { ...options, method: Methods.post })
+  post = (url: string, data = {}): Promise<XMLHttpRequest> => (
+    this.request(url, { data: JSON.stringify(data), method: Methods.post })
   );
 
-  put = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => (
+  put = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> => (
     this.request(url, { ...options, method: Methods.put })
   );
 
-  delete = (url: string, options: RequestOptions): Promise<XMLHttpRequest> => (
+  delete = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> => (
     this.request(url, { ...options, method: Methods.delete })
   );
 
@@ -50,7 +56,7 @@ export default class HTTPTransport {
     timeout = 5000,
   }: RequestOptions): Promise<XMLHttpRequest> => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
+    xhr.open(method, this.base + url);
 
     xhr.timeout = timeout;
 

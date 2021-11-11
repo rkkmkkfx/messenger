@@ -1,22 +1,16 @@
 import EventBus from './EventBus';
-import templator from './Templator';
 
-import type { ButtonProps } from '../components/Button';
-import type { InputProps } from '../components/Input';
 import { objectsAreEqual } from './utils';
+import { mount } from './VirtualDOM';
 
-export type ElementProps =
-  | ButtonProps
-  | InputProps;
-
-interface Component {
+interface Component<Props extends Record<string, any>> {
   componentDidMount?(): void;
-  componentDidUpdate?(oldProps: ComponentProps, newProps: ComponentProps): void;
+  componentDidUpdate?(oldProps: Props, newProps: Props): void;
 }
 
 const hasKey = <T extends Record<string, unknown>>(obj: T, k: keyof any): k is keyof T => k in obj;
 
-abstract class Component {
+abstract class Component<Props extends Record<string, any>> {
   static EVENTS = {
     INIT: 'init',
     FLOW_CDM: 'flow:component-did-mount',
@@ -25,36 +19,30 @@ abstract class Component {
     FLOW_RERENDER: 'flow:rerender',
   };
 
-  #element?: HTMLElement;
+  #element?: JSX.Element;
 
-  #children?: Node[];
-
-  #meta: {
-    tagOrParent: string | HTMLElement;
-    props: ComponentProps | ElementProps;
-  };
+  children?: JSX.Element[];
 
   name = 'Component';
 
-  readonly #eventBus: EventBus;
+  readonly #root?: HTMLElement;
 
-  protected props: ComponentProps | ElementProps;
+  readonly #eventBus: EventBus<Props>;
+
+  protected props: Props;
 
   /* ---- INIT ---- */
   /**
    * Component constructor
    *
-   * @param {string | HTMLElement} tagOrParent
    * @param {*} props - Component props
+   * @param children
+   * @param root
    */
-  constructor(tagOrParent: string | HTMLElement, props: ComponentProps | ElementProps) {
-    this.#meta = {
-      tagOrParent,
-      props,
-    };
-
-    this.props = this.#proxifyProps(props);
-
+  constructor(props: Props, children?: JSX.Element[], root?: HTMLElement) {
+    this.#root = root;
+    this.children = children;
+    this.props = this.#proxifyProps(props ?? {});
     this.#eventBus = new EventBus();
 
     this.#registerEvents(this.#eventBus);
@@ -67,7 +55,7 @@ abstract class Component {
    * @param {EventBus} eventBus - EventBus Instance
    * @private
    */
-  #registerEvents(eventBus: EventBus): void {
+  #registerEvents(eventBus: EventBus<Props>): void {
     eventBus.on(Component.EVENTS.INIT, this.init.bind(this));
     eventBus.on(Component.EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
     eventBus.on(Component.EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
@@ -79,9 +67,9 @@ abstract class Component {
    * @param props
    * @private
    */
-  #proxifyProps(props: ComponentProps | ElementProps): typeof props {
+  #proxifyProps(props: Props): typeof props {
     return new Proxy(props, {
-      get: (target: ComponentProps, prop: string) => {
+      get: (target: Props, prop: string) => {
         if (prop.startsWith('#')) {
           throw new Error('Нет прав');
         }
@@ -89,13 +77,13 @@ abstract class Component {
         const value = target[prop];
         return typeof value === 'function' ? value.bind(target) : value;
       },
-      set: (target: ComponentProps, prop: string, value: Primitive) => {
+      set: (target: Props, prop: string, value: Primitive) => {
         const oldProps = { ...target };
         const updated = target;
         if (prop.startsWith('#')) {
           throw new Error('Нет прав');
         }
-        if (hasKey(updated, prop)) updated[prop] = value;
+        if (hasKey(updated, prop)) (updated as Record<string, any>)[prop] = value;
         this.#eventBus.emit(Component.EVENTS.FLOW_CDU, oldProps, updated);
         return true;
       },
@@ -104,43 +92,10 @@ abstract class Component {
     });
   }
 
-  #setRootAttributes(): void {
-    Object.entries(this.props).forEach(([key, value]) => {
-      if (this.element && key in this.element) {
-        if (key === 'className') {
-          this.element[key] = String(value);
-        } else {
-          this.element?.setAttribute(key, `${value}`);
-        }
-      }
-    });
-  }
-
-  /**
-   * Creates a wrapper element and the DOM Range on it
-   * @private
-   */
-  #createResources(): void {
-    if (typeof this.#meta.tagOrParent === 'string') {
-      this.element = document.createElement(this.#meta.tagOrParent);
-      this.#setRootAttributes();
-    } else {
-      this.element = this.#meta.tagOrParent;
-    }
-
-    if (this.props.events) {
-      Object.entries<EventListenerOrEventListenerObject>(this.props.events)
-        .forEach(([eventType, handler]) => (
-          this.element?.addEventListener(eventType, handler)
-        ));
-    }
-  }
-
   /**
    * Creates component resources and starts the Lifecycle
    */
   init(): void {
-    this.#createResources();
     this.#eventBus.emit(Component.EVENTS.FLOW_CDM);
   }
 
@@ -155,7 +110,7 @@ abstract class Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  shouldUpdate(oldProps: ComponentProps, newProps: ComponentProps): boolean {
+  shouldUpdate(oldProps: Props, newProps: Props): boolean {
     return !objectsAreEqual(oldProps, newProps);
   }
 
@@ -165,7 +120,7 @@ abstract class Component {
    * @param newProps
    * @private
    */
-  #componentDidUpdate(oldProps: ComponentProps, newProps: ComponentProps): void {
+  #componentDidUpdate(oldProps: Props, newProps: Props): void {
     const shouldUpdate = this.shouldUpdate(oldProps, newProps);
     if (shouldUpdate) {
       if (this.componentDidUpdate) this.componentDidUpdate(oldProps, newProps);
@@ -177,7 +132,7 @@ abstract class Component {
    *
    * @param nextProps
    */
-  setProps = (nextProps: ComponentProps): void => {
+  setProps = (nextProps: Props): void => {
     if (!nextProps) {
       return;
     }
@@ -186,19 +141,25 @@ abstract class Component {
   };
 
   #render(): void {
-    this.#children = templator.compile(this.render(), this.props);
-    if (this.#children.length && 'children' in this.element!) {
-      this.element?.replaceChildren(...this.#children);
+    this.#element = this.render();
+    // if (this.props.events) {
+    //   Object.entries<EventListenerOrEventListenerObject>(this.props.events)
+    //     .forEach(([eventType, handler]) => (
+    //       this.element?.addEventListener(eventType, handler)
+    //     ));
+    // }
+    if (this.#root) {
+      mount(this.#element, this.#root);
     }
   }
 
-  abstract render(): string;
+  abstract render(): JSX.Element;
 
-  get element(): HTMLElement | undefined {
+  get element(): JSX.Element | undefined {
     return this.#element;
   }
 
-  set element(element: HTMLElement | undefined) {
+  set element(element: JSX.Element | undefined) {
     this.#element = element;
   }
 }
