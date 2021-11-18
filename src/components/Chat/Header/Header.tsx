@@ -1,5 +1,4 @@
-import parseJSX from '../../../core/VirtualDOM';
-import Component from '../../../core/Component';
+import Creact from '../../../core/Creact';
 
 import * as styles from './Header.module.pcss';
 
@@ -8,7 +7,7 @@ type HeaderProps = {
   title: string;
 };
 
-export default class Header extends Component<HeaderProps> {
+export default class Header extends Creact.Component<HeaderProps> {
   render(): JSX.Element {
     return (
       <header className={styles.root}>

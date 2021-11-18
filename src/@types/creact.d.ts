@@ -1,10 +1,16 @@
 /// <reference lib="DOM" />
 
 type VirtualDOMElement = {
-  tag: string;
-  props: Record<string, any>;
-  children: VirtualDOMElement[];
+  tag: any;
+  props: {
+    [key: string]: any,
+    children: VirtualDOMElement[];
+  }
 };
+
+declare type PropsWithChildren<Props> = Props & { children?: JSX.Element[] };
+
+declare type ExtNode = (Node | Text) & { __virtual: VirtualDOMElement };
 
 declare namespace JSX {
   // The return type of our JSX Factory: this could be anything
@@ -20,9 +26,5 @@ declare namespace JSX {
     }
   };
 
-  type Tag = string;
-
-  interface Component {
-    (properties?: { [key: string]: any }, children?: Node[]): Node
-  }
+  type Tag = any;
 }

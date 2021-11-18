@@ -2,6 +2,8 @@ declare type Nullable<T> = T | null;
 
 declare type Primitive = number | string | boolean | (() => void);
 
+declare type EmptyObject = Record<string, never>;
+
 declare type UserData = {
   id?: number,
   first_name: string;

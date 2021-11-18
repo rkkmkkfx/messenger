@@ -1,5 +1,4 @@
-import parseJSX from '../../../core/VirtualDOM';
-import Component from '../../../core/Component';
+import Creact from '../../../core/Creact';
 
 import * as styles from './ChatPreview.module.pcss';
 import type { MessageProps } from '../../Chat/Message';
@@ -12,7 +11,7 @@ export type ChatPreviewProps = {
   last_message: MessageProps;
 };
 
-export default class ChatPreview extends Component<ChatPreviewProps> {
+export default class ChatPreview extends Creact.Component<ChatPreviewProps> {
   render(): JSX.Element {
     return (
       <div className={styles.root}>

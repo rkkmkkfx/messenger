@@ -1,6 +1,10 @@
+export { default as getFormValues } from './getFormValues';
+
 export const isObject = (value: any): boolean => value != null && typeof value === 'object';
 
 const isArray = (value: any): boolean => Array.isArray(value);
+
+export const hasKey = <T extends Record<string, unknown>>(obj: T, k: keyof any): k is keyof T => k in obj;
 
 export function objectsAreEqual(first: Record<string, any>, second: Record<string, any>): boolean {
   const firstObjectKeys = Object.keys(first);

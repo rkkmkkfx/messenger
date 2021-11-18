@@ -1,5 +1,4 @@
-import parseJSX from '../../core/VirtualDOM';
-import Component from '../../core/Component';
+import Creact from '../../core/Creact';
 
 import * as styles from './IconButton.module.pcss';
 
@@ -9,7 +8,7 @@ type IconButtponProps = {
   variant: string;
 };
 
-export default class IconButton extends Component<IconButtponProps> {
+export default class IconButton extends Creact.Component<IconButtponProps> {
   render(): JSX.Element {
     return (
       <button className={`${styles.root} ${styles[this.props.variant]}`} type={this.props.type}>

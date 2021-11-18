@@ -1,13 +1,12 @@
-import Component from '../../core/Component';
-
+import Creact from '../../core/Creact';
 import Sidebar from '../../components/Sidebar/Sidebar';
 
 import template from './ProfilePage.tmpl';
 import Chat from '../../components/Chat';
 
-export default class ProfilePage extends Component {
-  constructor(root: HTMLElement, props: ComponentProps) {
-    super(root, {
+export default class ProfilePage extends Creact.Component {
+  constructor(props: EmptyObject) {
+    super({
       ...props,
       sidebar: new Sidebar('aside', props.sidebar).element,
       chat: new Chat('section', props.chat).element,

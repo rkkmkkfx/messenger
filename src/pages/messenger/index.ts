@@ -1,7 +1,7 @@
-import { ChatsPageProps } from './ChatsPage';
+import { ChatsPageProps } from './MessengerPage';
 
-export { default } from './ChatsPage';
-export type { ChatsPageProps } from './ChatsPage';
+export { default } from './MessengerPage';
+export type { ChatsPageProps } from './MessengerPage';
 
 export const props: ChatsPageProps = {
   sidebar: {

@@ -1,31 +1,41 @@
-import parseJSX from '../../core/VirtualDOM';
-import Component from '../../core/Component';
+import Creact from '../../core/Creact';
 
 import * as styles from './Input.module.pcss';
-import { validate, setValidationProps } from '../../core/Validator';
+import { validate } from '../../core/Validator';
 
 export type InputProps = {
   name: string;
+  label: string;
   placeholder?: string;
   type: string;
   autocomplete: string;
   value?: string;
-  events?: {
-    [key: string]: EventListenerOrEventListenerObject;
-  };
+  pattern?: string;
+  minLength?: number;
+  maxLength?: number;
+  required?: true;
 };
 
-export default class Input extends Component<InputProps> {
+export type InputState = {
+  errors: string[],
+  shouldValidate: boolean;
+};
+
+export default class Input extends Creact.Component<InputProps, InputState> {
   render(): JSX.Element {
+    const { errors } = this.state;
     return (
-      <input
-        {...this.props}
-        {...setValidationProps(this.props.name)}
-        className={styles.root}
-        onBlur={validate}
-        onFocus={validate}
-        onInvalid={console.log}
-      />
+      <label className={styles.root}>
+        <span className={styles.label}>{this.props.label}</span>
+        <input
+          {...this.props}
+          className={styles.input}
+          onBlur={validate.bind(this)}
+          onFocus={validate.bind(this)}
+          onInvalid={() => console.log('Error')}
+        />
+        <span className={styles.helperText}>{errors?.join('\n') ?? ''}</span>
+      </label>
     );
   }
 }

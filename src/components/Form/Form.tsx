@@ -1,5 +1,4 @@
-import parseJSX from '../../core/VirtualDOM';
-import Component from '../../core/Component';
+import Creact from '../../core/Creact';
 
 import Input from '../Input';
 import Button from '../Button';
@@ -14,7 +13,7 @@ export type FormProps = {
   onSubmit?: GlobalEventHandlers['onsubmit'];
 };
 
-export default class Form extends Component<FormProps> {
+export default class Form extends Creact.Component<FormProps> {
   render(): JSX.Element {
     return (
       <form className={styles.root} onSubmit={this.props.onSubmit} noValidate>

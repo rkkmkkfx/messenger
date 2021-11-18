@@ -1,6 +1,5 @@
-import parseJSX from '../../core/VirtualDOM';
-import Component from '../../core/Component';
-import Router from '../../core/Router';
+import Creact from '../../core/Creact';
+import Router from '../../core/router/Router';
 
 import * as styles from './Button.module.pcss';
 
@@ -14,7 +13,7 @@ export type ButtonProps = {
 
 const router = new Router();
 
-export default class Button extends Component<ButtonProps> {
+export default class Button extends Creact.Component<ButtonProps> {
   onClick(event: MouseEvent): void {
     if (this.props.to) {
       event.preventDefault();
@@ -25,6 +24,7 @@ export default class Button extends Component<ButtonProps> {
   render(): JSX.Element {
     return (
       <button
+        type={this.props.type}
         className={`${styles.root} ${styles[String(this.props.variant)]}`}
         onClick={this.props.onClick ?? this.onClick.bind(this)}
       >
