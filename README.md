@@ -36,10 +36,10 @@
 type VirtualDOMNode = {
   tag: string;
   props: Record<string, string>;
-  children: VirtualDOMElement[];
+  children: JSX.Element[];
 };
 
-type VirtualDOMElement =
+type JSX.Element =
   | HTMLElement
   | string
   | VirtualDOMNode;
@@ -47,13 +47,13 @@ type VirtualDOMElement =
 и уже из этого VirtualDOM собирается DOM компонента/страницы
 
 *Сделано это было для подключения
-babel-jsx с custom parsing function в дальнейшем.*
+babel-VDom с custom parsing function в дальнейшем.*
 
 ---
 
 #### Core functions
 
-* `/src/core/Component.ts` - Базовый класс для всех компонентов
+* `/src/core/CreactComponent.ts` - Базовый класс для всех компонентов
 * `src/core/EventBus.ts` - шина событий, для реализации жизненного цикла компонента
 * `/src/core/HTTPTransport.ts` - XHR запросы
 * `/src/core/pageLoader.ts` - Временное решение, пока не появится нормальный routing
@@ -69,7 +69,7 @@ babel-jsx с custom parsing function в дальнейшем.*
 ```ts
 import Child from '../Child';
 
-class Parent extends Component {
+class Parent extends CreactComponent {
   constructor(tag, props) {
     super(tag, {
       ...props,

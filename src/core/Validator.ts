@@ -1,70 +1,53 @@
-type Rule = {
-  pattern: RegExp;
-  errorMessage: string;
-};
+type Constraint = Record<keyof ValidityState, string>;
 
-export const constraints: Record<string, Rule> = {
+export const constraints: Record<string, Partial<Constraint>> = {
   first_name: {
-    pattern: /[\u0400-\u04FFa-z-]+/gi,
-    errorMessage: 'Pattern mismatch',
+    patternMismatch: 'Pattern mismatch',
   },
-  last_name: {
-    pattern: /[\u0400-\u04FFa-z-]+/gi,
-    errorMessage: 'Pattern mismatch',
+  second_name: {
+    patternMismatch: 'Pattern mismatch',
   },
   login: {
-    pattern: /^.*(?=.{3,20})(?=.*[a-z])\w+$/gi,
-    errorMessage: 'Login should contains at least one letter',
+    patternMismatch: 'Login should contains at least one letter',
+    tooShort: 'Too short',
+    tooLong: 'Too long',
+    valueMissing: 'This field is required',
   },
   email: {
-    pattern: /^[a-z]+\w+[a-z-]+@([\w-]+\.)+[a-z]{2,4}$/gi,
-    errorMessage: 'Wrong email address',
+    patternMismatch: 'Wrong email address',
+    valueMissing: 'This field is required',
   },
   password: {
-    pattern: /^(?=^.{8,40}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$/g,
-    errorMessage: 'Password should contains at least one Uppercase letter and one digit',
+    patternMismatch: 'Password should contains at least one Uppercase letter and one digit',
+    tooShort: 'Too short',
+    tooLong: 'Too long',
+    valueMissing: 'This field is required',
   },
   phone: {
-    pattern: /\+?\d{10,15}/g,
-    errorMessage: 'Wrong phone number',
+    patternMismatch: 'Wrong phone number',
+    tooShort: 'Too short',
+    tooLong: 'Too long',
   },
   message: {
-    pattern: /.+/gm,
-    errorMessage: 'This field is required',
+    valueMissing: 'This field is required',
   },
+  search: {},
 };
 
-export function validate({ type: eventType, target }: Event): ValidityState {
-  const typedTarget = target as HTMLInputElement;
-  if (typedTarget.name in constraints) {
-    const rule = constraints[typedTarget.name];
-    const constraint = new RegExp(rule.pattern);
-    const valid = constraint.test(typedTarget.value);
-    if (!valid) {
-      typedTarget.setCustomValidity(rule.errorMessage);
-    } else {
-      typedTarget.setCustomValidity('');
-    }
-    if (eventType === 'submit') {
-      typedTarget.reportValidity();
-    } else {
-      typedTarget.checkValidity();
-    }
-  }
+export function validate({ currentTarget }: Event): string[] {
+  const typedTarget = currentTarget as HTMLInputElement;
+  const { name, validity } = typedTarget;
+  if (name in constraints) {
+    const rules = constraints[name];
+    const errors = Object.entries(rules).map(([key, rule]) => {
+      const typedKey = key as keyof ValidityState;
+      if (validity[typedKey]) {
+        return rule;
+      }
+      return '';
+    }).filter((error) => error.length);
 
-  return typedTarget.validity;
-}
-
-export default function validateForm(form: HTMLFormElement, cb: () => void): void {
-  const validity = [];
-  for (let i = 0; i < form.elements.length; i++) {
-    const element = form.elements.item(i);
-    if (element?.tagName === 'INPUT') {
-      validity.push(validate({ target: element } as unknown as Event).valid);
-    }
+    return errors;
   }
-
-  if (!validity.some(() => false)) {
-    cb();
-  }
+  return [];
 }

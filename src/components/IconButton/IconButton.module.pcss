@@ -1,9 +1,17 @@
 .root {
   display: block;
-  width: 48px;
-  height: 48px;
   border-radius: 50%;
   border: none;
+
+  &.small {
+    width: 32px;
+    height: 32px;
+  }
+
+  &.large {
+    width: 48px;
+    height: 48px;
+  }
 
   &.primary {
     color: var(--primary-contrastTextColor);
@@ -26,6 +34,11 @@
       border-color: var(--primary-dark);
       background-color: var(--primary-light);
       text-decoration: none;
+    }
+
+    &.active {
+      color: var(--surface);
+      background-color: var(--primary-main);
     }
   }
 }

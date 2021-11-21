@@ -1,0 +1,36 @@
+.root {
+  margin: auto;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 100%;
+
+  .fields {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 16px;
+    margin: 32px 0;
+  }
+
+  .buttons {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 16px;
+  }
+}
+
+.fields {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 16px;
+  margin: 32px 0;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.value {
+  margin-bottom: 16px;
+}
