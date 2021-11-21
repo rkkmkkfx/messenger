@@ -1,8 +1,7 @@
 import type { ChatPreviewProps } from '../../components/Sidebar/ChatPreview';
-import type {CurrentChat} from '../../components/Chat/Chat';
+import type { CurrentChat } from '../../components/Chat/Chat';
 
-const initialState: StoreState = {
-};
+const initialState: StoreState = {};
 
 export type StoreState = {
   user?: UserData;

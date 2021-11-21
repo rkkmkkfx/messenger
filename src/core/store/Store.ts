@@ -14,12 +14,11 @@ export default class Store {
 
   #state: StoreState;
 
-  constructor(reducers: Record<string, Reducer>, initialState: StoreState) {
+  constructor(initialState: StoreState, reducers: Record<string, Reducer>) {
+    console.log(reducers, initialState);
     this.#listeners = [];
     this.#reducers = reducers;
     this.#state = this.#reduce(initialState, {});
-
-    window.store = this;
   }
 
   get state(): StoreState {

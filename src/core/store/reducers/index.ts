@@ -1,1 +1,5 @@
-export { default as user } from './userReducers';
+import user from './userReducers';
+
+export default {
+  user,
+};

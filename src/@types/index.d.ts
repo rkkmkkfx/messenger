@@ -2,7 +2,11 @@ declare type Nullable<T> = T | null;
 
 declare type Primitive = number | string | boolean | (() => void);
 
+declare type DefaultObject = Record<string, unknown>;
+
 declare type EmptyObject = Record<string, never>;
+
+declare type PageElement = PageElement;
 
 declare type UserData = {
   id?: number,

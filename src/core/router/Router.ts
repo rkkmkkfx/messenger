@@ -1,4 +1,4 @@
-import Route, { Page } from './Route';
+import Route from './Route';
 
 export default class Router {
   static __instance: Router;
@@ -24,8 +24,8 @@ export default class Router {
     Router.__instance = this;
   }
 
-  use(pathname: string, block: Page): Router {
-    const route = new Route(pathname, block);
+  use(pathname: string, element: JSX.Element): Router {
+    const route = new Route(pathname, element);
     this.routes?.push(route);
     return this;
   }

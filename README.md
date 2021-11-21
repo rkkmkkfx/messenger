@@ -36,10 +36,10 @@
 type VirtualDOMNode = {
   tag: string;
   props: Record<string, string>;
-  children: VirtualDOMElement[];
+  children: JSX.Element[];
 };
 
-type VirtualDOMElement =
+type JSX.Element =
   | HTMLElement
   | string
   | VirtualDOMNode;

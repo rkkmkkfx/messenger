@@ -1,8 +1,10 @@
 import Store from './Store';
 
 import initialState from './state';
-import * as reducers from './reducers';
+import reducers from './reducers';
 
-console.log(initialState);
-
-export default new Store(reducers, initialState);
+export default new Store(initialState, {
+  ...reducers,
+  chat: (state, action) => state,
+  chats: (state, action) => state,
+});

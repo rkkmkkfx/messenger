@@ -9,26 +9,23 @@ import store from '../../core/store';
 
 import * as styles from './SignUpPage.module.pcss';
 import { getFormValues } from '../../core/utils';
+import auth from '../../api/auth-api';
 
-export type UserFormPageState = {
-  isSignInForm: boolean;
-};
-
-export default class UserFormPage extends Creact.Component<EmptyObject, UserFormPageState> {
+export default class SignUpPage extends Creact.Component {
   submitHandler(event: Event): void {
     event.preventDefault();
+    auth.signup(getFormValues(event.target as HTMLFormElement)).then(console.log);
     store.dispatch({
-      type: 'REGISTER',
+      type: 'STORE_USER',
       payload: getFormValues(event.target as HTMLFormElement),
     });
     router.go('/messenger');
   }
 
   render(): JSX.Element {
-    console.log('SignUpPage');
     return (
       <Card heading="Create User">
-        <form className={styles.root} onSubmit={this.submitHandler}>
+        <form className={styles.root} onSubmit={this.submitHandler} noValidate>
           <div className={styles.fields}>
             <Input
               name="email"
@@ -56,7 +53,7 @@ export default class UserFormPage extends Creact.Component<EmptyObject, UserForm
               pattern="[а-яА-Яa-zA-Z-]+"
             />
             <Input
-              name="last_name"
+              name="second_name"
               type="string"
               autocomplete="family-name"
               label="Last Name"

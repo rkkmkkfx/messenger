@@ -9,9 +9,9 @@ export default class Controls extends Creact.Component<Record<string, any>> {
   render(): JSX.Element {
     return (
       <form className={styles.root}>
-        <IconButton icon="fas fa-paperclip" variant="secondary" />
+        <IconButton size="large" icon="fas fa-paperclip" variant="secondary" onClick={console.log} />
         <Input name="message" label="Type your message here" type="text" autocomplete="off" />
-        <IconButton icon="fas fa-paper-plane" variant="primary" type="submit" />
+        <IconButton size="large" icon="fas fa-paper-plane" variant="primary" type="submit" />
       </form>
     );
   }

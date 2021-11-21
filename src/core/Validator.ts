@@ -1,12 +1,10 @@
-import Input from '../components/Input';
-
 type Constraint = Record<keyof ValidityState, string>;
 
 export const constraints: Record<string, Partial<Constraint>> = {
   first_name: {
     patternMismatch: 'Pattern mismatch',
   },
-  last_name: {
+  second_name: {
     patternMismatch: 'Pattern mismatch',
   },
   login: {
@@ -36,8 +34,7 @@ export const constraints: Record<string, Partial<Constraint>> = {
   search: {},
 };
 
-export function validate(this: Input, { currentTarget }: Event): void {
-  console.log(currentTarget);
+export function validate({ currentTarget }: Event): string[] {
   const typedTarget = currentTarget as HTMLInputElement;
   const { name, validity } = typedTarget;
   if (name in constraints) {
@@ -50,12 +47,7 @@ export function validate(this: Input, { currentTarget }: Event): void {
       return '';
     }).filter((error) => error.length);
 
-    typedTarget.setCustomValidity('Error');
-
-    console.log(typedTarget.validity);
-
-    this.setState({
-      errors: ['Error'],
-    });
+    return errors;
   }
+  return [];
 }

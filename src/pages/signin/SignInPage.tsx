@@ -6,26 +6,27 @@ import Button from '../../components/Button';
 import router from '../../core/router';
 
 import store from '../../core/store';
+import auth from '../../api/auth-api';
 
 import * as styles from './SignInPage.module.pcss';
 import { getFormValues } from '../../core/utils';
 
-export type UserFormPageState = {
-  isSignInForm: boolean;
-};
-
-export default class UserFormPage extends Creact.Component<EmptyObject, UserFormPageState> {
+export default class SignInPage extends Creact.Component {
   submitHandler(event: Event): void {
     event.preventDefault();
-    store.dispatch({
-      type: 'REGISTER',
-      payload: getFormValues(event.target as HTMLFormElement),
-    });
-    router.go('/messenger');
+    auth.signin(getFormValues(event.target as HTMLFormElement))
+      .then(() => {
+        router.go('/messenger');
+      });
+  }
+
+  componentDidMount() {
+    if (store.state.user) {
+      router.go('/messenger');
+    }
   }
 
   render(): JSX.Element {
-    console.log('Page');
     return (
       <Card heading="Sign In">
         <form className={styles.root} onSubmit={this.submitHandler} noValidate>

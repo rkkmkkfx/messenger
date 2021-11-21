@@ -1,7 +1,7 @@
 import Creact from '../Creact';
 
 export type Page = new (
-  props: { children?: VirtualDOMElement[] },
+  props: { children?: JSX.Element[] },
 ) => Creact.Component<EmptyObject, Record<string, unknown>>;
 
 function isEqual(lhs: string, rhs: string) {
@@ -11,19 +11,16 @@ function isEqual(lhs: string, rhs: string) {
 export default class Route {
   #pathname: string;
 
-  #block: Nullable<HTMLElement | Text | HTMLElement[]>;
-
   #root?: HTMLElement;
 
-  readonly #Page: Page;
+  readonly #element: JSX.Element;
 
   constructor(
     pathname: string,
-    view: Page,
+    element: JSX.Element,
   ) {
     this.#pathname = pathname;
-    this.#Page = view;
-    this.#block = null;
+    this.#element = element;
   }
 
   navigate(pathname: string) {
@@ -33,9 +30,7 @@ export default class Route {
     }
   }
 
-  leave() {
-    this.#block = null;
-  }
+  leave() {}
 
   match(pathname: string) {
     return isEqual(pathname, this.#pathname);
@@ -43,6 +38,6 @@ export default class Route {
 
   render(root: HTMLElement) {
     this.#root = root;
-    this.#block = Creact.mount(new this.#Page({}).render(), this.#root);
+    Creact.render(this.#element, this.#root);
   }
 }

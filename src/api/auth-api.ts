@@ -1,13 +1,25 @@
 import HTTPTransport, { BaseAPI } from '../core/http';
 
-const chatAPIInstance = new HTTPTransport('api/v2/auth');
+const authAPIInstance = new HTTPTransport('https://ya-praktikum.tech/api/v2/auth');
 
-export default class AuthAPI extends BaseAPI {
-  create() {
-    return chatAPIInstance.post('/', { title: 'string' });
+class AuthAPI extends BaseAPI {
+  signup(props) {
+    return authAPIInstance.post('/signup', props);
   }
 
-  request() {
-    return chatAPIInstance.get('/full');
+  signin(props) {
+    return authAPIInstance.post('/signin', props);
+  }
+
+  user() {
+    return authAPIInstance.get('/user');
+  }
+
+  signout() {
+    return authAPIInstance.post('/logout', {});
   }
 }
+
+const auth = new AuthAPI();
+
+export default auth;

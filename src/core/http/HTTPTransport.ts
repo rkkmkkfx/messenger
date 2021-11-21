@@ -56,9 +56,12 @@ export default class HTTPTransport {
     timeout = 5000,
   }: RequestOptions): Promise<XMLHttpRequest> => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
     xhr.open(method, this.base + url);
 
     xhr.timeout = timeout;
+
+    xhr.setRequestHeader('content-type', 'application/json');
 
     if (headers) {
       Object.entries(headers).forEach(([header, value]) => xhr.setRequestHeader(header, value));

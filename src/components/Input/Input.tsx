@@ -30,9 +30,12 @@ export default class Input extends Creact.Component<InputProps, InputState> {
         <input
           {...this.props}
           className={styles.input}
-          onBlur={validate.bind(this)}
-          onFocus={validate.bind(this)}
-          onInvalid={() => console.log('Error')}
+          onBlur={(event: Event) => this.setState({
+            errors: validate(event),
+          })}
+          onFocus={(event: Event) => this.setState({
+            errors: validate(event),
+          })}
         />
         <span className={styles.helperText}>{errors?.join('\n') ?? ''}</span>
       </label>
