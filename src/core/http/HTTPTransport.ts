@@ -41,12 +41,12 @@ export default class HTTPTransport {
     this.request(url, { data: JSON.stringify(data), method: Methods.post })
   );
 
-  put = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> => (
-    this.request(url, { ...options, method: Methods.put })
+  put = (url: string, data = {}): Promise<XMLHttpRequest> => (
+    this.request(url, { data: JSON.stringify(data), method: Methods.put })
   );
 
-  delete = (url: string, options: RequestOptions = {}): Promise<XMLHttpRequest> => (
-    this.request(url, { ...options, method: Methods.delete })
+  del = (url: string, data = {}): Promise<XMLHttpRequest> => (
+    this.request(url, { data: JSON.stringify(data), method: Methods.delete })
   );
 
   request = (url: string, {

@@ -3,10 +3,14 @@ import './global.pcss';
 
 import { library, dom } from '@fortawesome/fontawesome-svg-core';
 import {
+  faUser,
   faPaperclip,
   faPaperPlane,
   faSignOutAlt,
-  faUser,
+  faTrash,
+  faTimes,
+  faUserPlus,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 
 import '@fontsource/noto-sans';
@@ -27,5 +31,5 @@ router
   .use('/error', <ErrorPage />)
   .connect(document.getElementById('app')!);
 
-library.add(faPaperclip, faPaperPlane, faSignOutAlt, faUser);
+library.add(faPaperclip, faPaperPlane, faSignOutAlt, faUser, faTrash, faTimes, faUserPlus, faPlus);
 dom.watch();

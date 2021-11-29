@@ -6,7 +6,7 @@ import Button from '../../components/Button';
 import router from '../../core/router';
 
 import store from '../../core/store';
-import auth from '../../api/auth-api';
+import auth from '../../core/http/api/auth-api';
 
 import * as styles from './SignInPage.module.pcss';
 import { getFormValues } from '../../core/utils';
@@ -14,7 +14,10 @@ import { getFormValues } from '../../core/utils';
 export default class SignInPage extends Creact.Component {
   submitHandler(event: Event): void {
     event.preventDefault();
-    auth.signin(getFormValues(event.target as HTMLFormElement))
+    const { currentTarget } = event;
+    const typedTarget = currentTarget as HTMLFormElement;
+    const credentials = getFormValues(typedTarget);
+    auth.signin(credentials)
       .then(() => {
         router.go('/messenger');
       });

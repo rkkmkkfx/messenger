@@ -5,16 +5,16 @@ export type Action = {
   payload?: any;
 };
 
-export type Reducer = (state: StoreState, action: Action) => StoreState;
+export type Reducer<K extends keyof StoreState> = (state: StoreState[K], action: Action) => StoreState[K];
 
 export default class Store {
   #listeners: ((...args: any[]) => void)[];
 
-  readonly #reducers: Record<string, Reducer>;
+  readonly #reducers: Record<string, Reducer<any>>;
 
   #state: StoreState;
 
-  constructor(initialState: StoreState, reducers: Record<string, Reducer>) {
+  constructor(initialState: StoreState, reducers: Record<string, Reducer<any>>) {
     console.log(reducers, initialState);
     this.#listeners = [];
     this.#reducers = reducers;
@@ -25,7 +25,7 @@ export default class Store {
     return this.#state;
   }
 
-  subscribe(fn: (...args: unknown[]) => void): () => void {
+  subscribe(fn: (state: StoreState) => void): () => void {
     this.#listeners = [...this.#listeners, fn];
     fn(this.state);
     return () => { this.#listeners = this.#listeners.filter((sub) => sub !== fn); };
@@ -39,7 +39,10 @@ export default class Store {
   #reduce(state: StoreState, action: Action | EmptyObject): StoreState {
     const newState = {} as StoreState;
     Object.keys(this.#reducers).forEach((prop) => {
-      newState[prop] = this.#reducers[prop](state[prop], action as Action);
+      (newState as DefaultObject)[prop] = this.#reducers[prop](
+        (state as DefaultObject)[prop] as StoreState,
+        action as Action,
+      );
     });
 
     return newState;

@@ -8,12 +8,14 @@ export type InputProps = {
   label: string;
   placeholder?: string;
   type: string;
-  autocomplete: string;
+  autocomplete?: string;
   value?: string;
   pattern?: string;
   minLength?: number;
   maxLength?: number;
   required?: true;
+  hidden?: true;
+  onInput?: EventListenerOrEventListenerObject;
 };
 
 export type InputState = {
@@ -25,7 +27,7 @@ export default class Input extends Creact.Component<InputProps, InputState> {
   render(): JSX.Element {
     const { errors } = this.state;
     return (
-      <label className={styles.root}>
+      <label className={[styles.root, this.props.hidden ? styles.hidden : undefined].join(' ')}>
         <span className={styles.label}>{this.props.label}</span>
         <input
           {...this.props}
@@ -36,6 +38,7 @@ export default class Input extends Creact.Component<InputProps, InputState> {
           onFocus={(event: Event) => this.setState({
             errors: validate(event),
           })}
+          onInput={this.props.onInput}
         />
         <span className={styles.helperText}>{errors?.join('\n') ?? ''}</span>
       </label>

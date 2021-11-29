@@ -5,9 +5,20 @@ import store from '../../../core/store';
 import * as styles from './Message.module.pcss';
 
 export type MessageProps = {
-  user: UserData;
-  time: Date | string;
-  content: string;
+  chat_id: number,
+  time: string,
+  type: string,
+  user_id: number,
+  content: string,
+  file?: {
+    id: number,
+    user_id: number,
+    path: string,
+    filename: string,
+    content_type: string,
+    content_size: number,
+    upload_date: string,
+  }
 };
 
 export default class Message extends Creact.Component {

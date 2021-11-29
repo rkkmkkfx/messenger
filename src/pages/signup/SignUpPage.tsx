@@ -5,21 +5,20 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import router from '../../core/router';
 
-import store from '../../core/store';
-
 import * as styles from './SignUpPage.module.pcss';
 import { getFormValues } from '../../core/utils';
-import auth from '../../api/auth-api';
+import auth from '../../core/http/api/auth-api';
 
 export default class SignUpPage extends Creact.Component {
   submitHandler(event: Event): void {
     event.preventDefault();
-    auth.signup(getFormValues(event.target as HTMLFormElement)).then(console.log);
-    store.dispatch({
-      type: 'STORE_USER',
-      payload: getFormValues(event.target as HTMLFormElement),
+    const { currentTarget } = event;
+    const typedTarget = currentTarget as HTMLFormElement;
+    const user = getFormValues(typedTarget) as UserData;
+    user.display_name = `${user.first_name} ${user.second_name}`;
+    auth.signup(user).then(() => {
+      router.go('/messenger');
     });
-    router.go('/messenger');
   }
 
   render(): JSX.Element {
@@ -77,7 +76,7 @@ export default class SignUpPage extends Creact.Component {
               required
             />
             <Input
-              name="password"
+              name="passwordControl"
               type="password"
               autocomplete="new-password"
               label="Password (yeah, again...)*"

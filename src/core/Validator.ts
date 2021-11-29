@@ -37,8 +37,9 @@ export const constraints: Record<string, Partial<Constraint>> = {
 export function validate({ currentTarget }: Event): string[] {
   const typedTarget = currentTarget as HTMLInputElement;
   const { name, validity } = typedTarget;
-  if (name in constraints) {
-    const rules = constraints[name];
+  const constraintName = name.toLowerCase().includes('password') ? 'password' : name;
+  if (constraintName in constraints) {
+    const rules = constraints[constraintName];
     const errors = Object.entries(rules).map(([key, rule]) => {
       const typedKey = key as keyof ValidityState;
       if (validity[typedKey]) {

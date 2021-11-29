@@ -1,0 +1,6 @@
+{
+  "testUrl": "http://localhost",
+  "extension": ["ts"],
+  "spec": ["src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "require": "src/tests/register.ts"
+}

@@ -1,13 +1,21 @@
-import type { ChatPreviewProps } from '../../components/Sidebar/ChatPreview';
-import type { CurrentChat } from '../../components/Chat/Chat';
+import type { ChatData } from '../../components/Chat/Chat';
 
-const initialState: StoreState = {};
+const initialState: StoreState = {
+  user: undefined,
+  chats: {
+    activeId: undefined,
+    list: [],
+  },
+};
+
+type ChatsState = {
+  activeId?: number;
+  list?: ChatData[];
+};
 
 export type StoreState = {
   user?: UserData;
-  chats?: ChatPreviewProps[];
-  chat?: CurrentChat;
-  [key: string]: any;
+  chats?: ChatsState;
 };
 
 export default initialState;

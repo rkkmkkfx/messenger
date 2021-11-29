@@ -1,12 +1,15 @@
 export { default as getFormValues } from './getFormValues';
 
-export const isObject = (value: any): boolean => value != null && typeof value === 'object';
-
-const isArray = (value: any): boolean => Array.isArray(value);
-
 export const hasKey = <T extends Record<string, unknown>>(obj: T, k: keyof any): k is keyof T => k in obj;
 
-export function objectsAreEqual(first: Record<string, any>, second: Record<string, any>): boolean {
+const isObject = (value: unknown): boolean => Object.prototype.toString.call(value) === '[object Object]'
+  || Array.isArray(value);
+
+export function isEqual(first: Record<string, any>, second: Record<string, any>): boolean {
+  if (!isObject(first) || !isObject(second) || !first || !second) {
+    return false;
+  }
+
   const firstObjectKeys = Object.keys(first);
   const secondObjectKeys = Object.keys(second);
 
@@ -19,8 +22,7 @@ export function objectsAreEqual(first: Record<string, any>, second: Record<strin
     const firstValue = first[key];
     const secondValue = second[key];
     const areObjects = isObject(firstValue) && isObject(secondValue);
-    const areArrays = isArray(firstValue) && isArray(secondValue);
-    if (((areObjects || areArrays) && !objectsAreEqual(firstValue, secondValue))
+    if ((areObjects && !isEqual(firstValue, secondValue))
       || (!areObjects && firstValue !== secondValue)) {
       return false;
     }

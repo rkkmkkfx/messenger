@@ -1,5 +1,5 @@
 import EventBus from '../EventBus';
-import { objectsAreEqual } from '../utils';
+import { isEqual } from '../utils';
 import { updateInstance } from './reconciler';
 
 export function Fragment(_a: never, ...children: JSX.Element[]): JSX.Element[] {
@@ -19,8 +19,6 @@ export abstract class Component<
   };
 
   name = 'Component';
-
-  #dom?: PageElement | PageElement[];
 
   children?: JSX.Element[];
 
@@ -57,7 +55,7 @@ export abstract class Component<
    * @private
    */
   #registerEvents(eventBus: EventBus<State>): void {
-    eventBus.on(Component.EVENTS.INIT, this.init.bind(this));
+    eventBus.on(Component.EVENTS.INIT, this.#init.bind(this));
     eventBus.on(Component.EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
     eventBus.on(Component.EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
     eventBus.on(Component.EVENTS.FLOW_RENDER, this.#render.bind(this));
@@ -96,7 +94,7 @@ export abstract class Component<
   /**
    * Creates component resources and starts the Lifecycle
    */
-  init(): void {
+  #init(): void {
     this.#eventBus.emit(Component.EVENTS.FLOW_CDM);
   }
 
@@ -113,8 +111,8 @@ export abstract class Component<
   componentDidMount?(): void;
 
   // eslint-disable-next-line class-methods-use-this
-  shouldUpdate(prevState: State, nextState: State): boolean {
-    return !objectsAreEqual(prevState, nextState);
+  #shouldUpdate(prevState: State, nextState: State): boolean {
+    return !isEqual(prevState, nextState);
   }
 
   /**
@@ -124,7 +122,8 @@ export abstract class Component<
    * @private
    */
   #componentDidUpdate(prevState: State, nextState: State): void {
-    const shouldUpdate = this.shouldUpdate(prevState, nextState);
+    const shouldUpdate = this.#shouldUpdate(prevState, nextState);
+
     if (shouldUpdate) {
       if (this.componentDidUpdate) this.componentDidUpdate(prevState, nextState);
       this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
@@ -144,7 +143,7 @@ export abstract class Component<
 
     Object.assign(this.state, nextState);
     if (this.__internalInstance) {
-      updateInstance(this.__internalInstance!);
+      updateInstance(this.__internalInstance);
     }
   };
 
@@ -155,14 +154,6 @@ export abstract class Component<
   }
 
   abstract render(): JSX.Element;
-
-  get dom(): PageElement | PageElement[] | undefined {
-    return this.#dom;
-  }
-
-  set dom(element: PageElement | PageElement[] | undefined) {
-    this.#dom = element;
-  }
 
   get state(): State {
     return this.#state;

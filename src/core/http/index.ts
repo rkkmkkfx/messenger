@@ -1,2 +1,5 @@
 export { default } from './HTTPTransport';
-export { default as BaseAPI } from './BaseAPI';
+export { default as chatsAPI } from './api/chat-api';
+export { default as userAPI } from './api/user-api';
+export { default as authAPI } from './api/auth-api';
+export { default as messageAPI } from './api/message-api';

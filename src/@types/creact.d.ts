@@ -3,12 +3,12 @@ declare namespace Creact {
     dom?: PageElement;
     props: DefaultProps;
     element: JSX.Element;
-    childInstance: Nullable<Instance>;
+    selfInstance: Nullable<Instance>;
     childInstances: Nullable<Instance>[];
-    publicInstance: Component;
+    classInstance: Component;
   };
 
-  type DefaultProps = Partial<Record<keyof Attr | string, Primitive | EventListenerOrEventListenerObject>
+  type DefaultProps = Partial<Record<keyof Attr | string, Primitive | EventListenerOrEventListenerObject | unknown>
   & { children?: JSX.Element[] }>;
 
   interface Component<Props extends DefaultProps = DefaultProps, State extends DefaultObject = DefaultObject> {

@@ -1,17 +1,19 @@
+import type { Component } from './Component';
+
 let rootInstance: Nullable<Creact.Instance> = null;
 
-export function createPublicInstance(element: JSX.Element, internalInstance: Creact.Instance) {
+export function createClassInstance(element: JSX.Element, internalInstance?: Creact.Instance): Component {
   const { type: Instance, props } = element;
-  const publicInstance = new Instance(props);
-  publicInstance.__internalInstance = internalInstance;
-  return publicInstance;
+  const classInstance = new Instance(props);
+  classInstance.__internalInstance = internalInstance;
+  return classInstance;
 }
 
-export default function updateProps(
+function updateProps(
   _dom: PageElement,
   prevProps: Creact.DefaultProps,
   nextProps: Creact.DefaultProps,
-) {
+): void {
   const dom = _dom;
   const isEvent = ([key]: [string, unknown]) => key.startsWith('on');
   const isAttribute = ([key, value]: [string, unknown]) => !isEvent([key, value]) && key !== 'children';
@@ -20,8 +22,6 @@ export default function updateProps(
   Object.entries(prevProps).filter(isEvent).forEach(([key, value]) => {
     if (value instanceof Function) {
       const eventType = key.toLowerCase().substring(2);
-      console.log(eventType, value);
-      console.log(dom);
       dom.removeEventListener(eventType, value);
     }
   });
@@ -53,7 +53,7 @@ export default function updateProps(
   });
 }
 
-function createInstance(element: JSX.Element): any {
+function createInstance(element: JSX.Element, _dom?: HTMLElement): any {
   const { type, props } = element;
 
   if (typeof type === 'string') {
@@ -70,20 +70,21 @@ function createInstance(element: JSX.Element): any {
 
     return { dom, element, childInstances };
   }
-  // Instantiate component element
+  // Instantiate component class
   const instance = {} as Creact.Instance;
-  const publicInstance = createPublicInstance(element, instance);
-  const childElement = publicInstance.render();
-  const childInstance = createInstance(childElement);
-  const { dom } = childInstance;
+  const classInstance = createClassInstance(element, instance);
+  const childElement = classInstance.render();
+  const selfInstance = createInstance(childElement);
+  const { dom } = selfInstance ?? { dom: _dom };
 
   Object.assign(instance, {
-    dom, element, childInstance, publicInstance,
+    dom, element, selfInstance, classInstance,
   });
+
   return instance;
 }
 
-export function render(element: JSX.Element, container: PageElement) {
+export function render(element: JSX.Element, container: PageElement): void {
   const prevInstance = rootInstance;
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const nextInstance = reconcile(container, prevInstance, element);
@@ -101,6 +102,7 @@ function reconcileChildren(parentInstance: Creact.Instance, element: JSX.Element
     const childElement = nextChildElements[i];
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const newChildInstance = reconcile(dom, childInstance, childElement);
+
     newChildInstances.push(newChildInstance);
   }
   return newChildInstances.filter((instance) => instance !== null);
@@ -135,18 +137,19 @@ export function reconcile(
     instance.element = element;
     return instance;
   }
-  instance.publicInstance.props = element.props;
-  const childElement = instance.publicInstance.render();
-  const oldChildInstance = instance.childInstance;
+
+  instance.classInstance.props = element.props;
+  const childElement = instance.classInstance.render();
+  const oldChildInstance = instance.selfInstance;
   const childInstance = reconcile(parentDom, oldChildInstance, childElement);
   instance.dom = childInstance?.dom;
-  instance.childInstance = childInstance;
+  instance.selfInstance = childInstance;
   instance.element = element;
   return instance;
 }
 
-export function updateInstance(internalInstance: Creact.Instance): void {
-  const parentDom = internalInstance.dom?.parentNode as PageElement;
-  const { element } = internalInstance;
-  reconcile(parentDom, internalInstance, element);
+export function updateInstance(selfInstance: Creact.Instance): void {
+  const parentDom = selfInstance.dom?.parentNode as PageElement;
+  const { element } = selfInstance;
+  reconcile(parentDom, selfInstance, element);
 }
