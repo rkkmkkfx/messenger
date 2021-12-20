@@ -1,6 +1,6 @@
 import { Reducer } from '../Store';
 
-const userReducers: Reducer = (state, action) => {
+const userReducers: Reducer<'user'> = (state, action) => {
   switch (action.type) {
     case 'STORE_USER': {
       return {

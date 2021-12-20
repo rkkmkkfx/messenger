@@ -9,7 +9,6 @@ export default function createElement(
   ...rest: (JSX.Element | string | undefined)[]
 ): JSX.Element {
   const props = _props ?? {};
-  if (props.users) console.log(props.users);
   const hasChildren = rest.length > 0;
   const rawChildren: (JSX.Element | string | undefined)[] = hasChildren
     ? ([] as (JSX.Element | string | undefined)[]).concat(...rest)

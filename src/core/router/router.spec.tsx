@@ -24,19 +24,27 @@ class Two extends Component {
   }
 }
 
-describe('Router', () => {
-  router
-    .use('/one', <One />)
-    .use('/two', <Two />)
-    .connect(document.body);
+document.body.innerHTML = '';
 
-  it('/one should render One', () => {
+router
+  .use('/one', <One />)
+  .use('/two', <Two />)
+  .connect(document.body);
+
+describe('Router', () => {
+  it('/one should render <One />', (done) => {
     router.go('/one');
-    expect(document.body.textContent).contains('One');
+    setTimeout(() => {
+      expect(document.body.textContent).contains('One');
+      done();
+    }, 1);
   });
 
-  it('/two should render Two', () => {
+  it('/two should render <Two />', (done) => {
     router.go('/two');
-    expect(document.body.textContent).contains('Two');
+    setTimeout(() => {
+      expect(document.body.innerHTML).equal('<div>Two</div>');
+      done();
+    }, 1);
   });
 });

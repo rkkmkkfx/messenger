@@ -5,6 +5,7 @@ import userAPI from '../../../core/http/api/user-api';
 import Button from '../../Button';
 import Input from '../../Input';
 
+import store from '../../../core/store';
 import { getFormValues } from '../../../core/utils';
 
 import * as styles from './Profile.module.pcss';
@@ -18,10 +19,6 @@ export default class Profile extends Creact.Component<UserData> {
     };
   }
 
-  submitHandler = (event: SubmitEvent) => {
-    event.preventDefault();
-  };
-
   saveUser = (event: SubmitEvent): void => {
     event.preventDefault();
     const { currentTarget } = event;
@@ -34,6 +31,12 @@ export default class Profile extends Creact.Component<UserData> {
         if (status !== 200) {
           throw new Error(res.reason ?? statusText);
         }
+        userAPI.getById(user.id!).then(() => {
+          store.dispatch({
+            type: 'STORE_USER',
+            payload: user,
+          });
+        });
         this.setState({ mode: 'view' });
       });
   };
@@ -60,7 +63,7 @@ export default class Profile extends Creact.Component<UserData> {
           switch (mode) {
             case 'edit':
               return (
-                <form className={styles.root} onSubmit={this.saveUser} noValidate>
+                <form className={styles.form} onSubmit={this.saveUser} noValidate>
                   <div className={styles.fields}>
                     <Input
                       name="email"

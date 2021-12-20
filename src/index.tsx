@@ -29,6 +29,7 @@ router
   .use('/sign-up', <SignUpPage />)
   .use('/messenger', <MessengerPage />)
   .use('/error', <ErrorPage />)
+  .use('/404', <ErrorPage />)
   .connect(document.getElementById('app')!);
 
 library.add(faPaperclip, faPaperPlane, faSignOutAlt, faUser, faTrash, faTimes, faUserPlus, faPlus);

@@ -2,8 +2,6 @@ import HTTPTransport from '../HTTPTransport';
 
 const chatAPIInstance = new HTTPTransport('https://ya-praktikum.tech/api/v2/chats');
 
-console.log(chatAPIInstance);
-
 class ChatAPI {
   newChat(data: Record<'title', string>) {
     return chatAPIInstance.post('/', data);
@@ -13,8 +11,17 @@ class ChatAPI {
     return chatAPIInstance.put('/users', data);
   }
 
+  getUsers(id: number) {
+    return chatAPIInstance.get(`/${id}/users`);
+  }
+
+  delUsers(data: { users: number[], chatId: number }) {
+    return chatAPIInstance.del('/users', data);
+  }
+
   list() {
-    return chatAPIInstance.get('/');
+    return chatAPIInstance.get('/?limit=20')
+      .then(({ response }) => JSON.parse(response));
   }
 
   deleteChat(chatId: number) {
@@ -27,7 +34,5 @@ class ChatAPI {
 }
 
 const chatsAPI = new ChatAPI();
-
-console.log(chatsAPI);
 
 export default chatsAPI;

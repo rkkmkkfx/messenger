@@ -1,21 +1,13 @@
-import type { ChatData } from '../../components/Chat/Chat';
+import type { ChatInstance } from '../http';
 
 const initialState: StoreState = {
   user: undefined,
-  chats: {
-    activeId: undefined,
-    list: [],
-  },
-};
-
-type ChatsState = {
-  activeId?: number;
-  list?: ChatData[];
+  chats: [],
 };
 
 export type StoreState = {
   user?: UserData;
-  chats?: ChatsState;
+  chats?: ChatInstance[];
 };
 
 export default initialState;

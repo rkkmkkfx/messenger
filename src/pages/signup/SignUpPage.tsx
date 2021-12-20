@@ -1,5 +1,8 @@
 import Creact from '../../core/Creact';
 
+import store from '../../core/store';
+import { authAPI } from '../../core/http';
+
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -7,7 +10,6 @@ import router from '../../core/router';
 
 import * as styles from './SignUpPage.module.pcss';
 import { getFormValues } from '../../core/utils';
-import auth from '../../core/http/api/auth-api';
 
 export default class SignUpPage extends Creact.Component {
   submitHandler(event: Event): void {
@@ -16,9 +18,17 @@ export default class SignUpPage extends Creact.Component {
     const typedTarget = currentTarget as HTMLFormElement;
     const user = getFormValues(typedTarget) as UserData;
     user.display_name = `${user.first_name} ${user.second_name}`;
-    auth.signup(user).then(() => {
-      router.go('/messenger');
-    });
+    authAPI.signup(user)
+      .then(() => {
+        store.dispatch({
+          type: 'STORE_USER',
+          payload: undefined,
+        });
+        router.go('/');
+      })
+      .then(() => {
+        router.go('/messenger');
+      });
   }
 
   render(): JSX.Element {

@@ -13,9 +13,9 @@ type DialogProps = {
 };
 
 export default class Modal extends Creact.Component<DialogProps> {
-  close(): void {
+  close = (): void => {
     this.props.onClose();
-  }
+  };
 
   render(): JSX.Element {
     return (
@@ -26,7 +26,7 @@ export default class Modal extends Creact.Component<DialogProps> {
             variant="plain"
             icon="fas fa-times"
             className={styles.close}
-            onClick={() => this.close()}
+            onClick={this.close}
           />
           {this.children}
         </Card>

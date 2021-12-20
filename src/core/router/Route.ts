@@ -1,9 +1,5 @@
 import Creact from '../Creact';
 
-export type Page = new (
-  props: { children?: JSX.Element[] },
-) => Creact.Component<EmptyObject, Record<string, unknown>>;
-
 function isEqual(lhs: string, rhs: string) {
   return lhs === rhs;
 }
@@ -11,7 +7,7 @@ function isEqual(lhs: string, rhs: string) {
 export default class Route {
   #pathname: string;
 
-  #root?: HTMLElement;
+  #root!: HTMLElement;
 
   readonly #element: JSX.Element;
 
@@ -23,20 +19,24 @@ export default class Route {
     this.#element = element;
   }
 
-  navigate(pathname: string) {
+  navigate(pathname: string): void {
     if (this.match(pathname)) {
       this.#pathname = pathname;
       this.render(this.#root!);
     }
   }
 
-  leave() {}
+  leave(): void {
+    if (this.#root) {
+      this.#root.innerHTML = '';
+    }
+  }
 
-  match(pathname: string) {
+  match(pathname: string): boolean {
     return isEqual(pathname, this.#pathname);
   }
 
-  render(root: HTMLElement) {
+  render(root: HTMLElement): void {
     this.#root = root;
     Creact.render(this.#element, this.#root);
   }

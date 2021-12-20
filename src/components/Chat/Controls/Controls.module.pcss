@@ -1,8 +1,14 @@
 .root {
-  display: grid;
-  grid-gap: 16px;
-  grid-auto-flow: column;
-  align-content: center;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 12px 0;
   border-top: 1px solid var(--surface-dark);
-  grid-auto-columns: 48px auto 48px;
+
+  .form {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 16px;
+    grid-auto-columns: 48px auto 48px;
+  }
 }

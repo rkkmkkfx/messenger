@@ -12,7 +12,14 @@ class AuthAPI {
   }
 
   user() {
-    return authAPIInstance.get('/user');
+    return authAPIInstance.get('/user').then((data) => {
+      if (data.status !== 200) {
+        const error = JSON.parse(data.response);
+        const errorMessage = `Error: ${error.reason}`;
+        throw new Error(errorMessage);
+      }
+      return JSON.parse(data.response);
+    });
   }
 
   signout() {

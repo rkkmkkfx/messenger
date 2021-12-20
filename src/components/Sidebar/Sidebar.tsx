@@ -1,9 +1,14 @@
 import Creact from '../../core/Creact';
 
 import router from '../../core/router';
-import store from '../../core/store';
-import authAPI from '../../core/http/api/auth-api';
-import chatsAPI from '../../core/http/api/chat-api';
+import store, { connect } from '../../core/store';
+
+import {
+  authAPI,
+  ChatData,
+  chatsAPI,
+  ChatInstance,
+} from '../../core/http';
 
 import { getFormValues } from '../../core/utils';
 
@@ -14,72 +19,19 @@ import Profile from './Profile';
 import IconButton from '../IconButton';
 import ChatPreview from './ChatPreview';
 
-import type { ChatData } from '../Chat/Chat';
-
 import * as styles from './Sidebar.module.pcss';
 
 export type SidebarState = {
-  userFetched: boolean;
+  user: UserData,
+  chats: ChatInstance[],
+  search: string;
   profileActive: boolean;
-  isUpdateNeeded: boolean;
   showNewChatDialog: boolean;
 };
 
-export default class Sidebar extends Creact.Component<EmptyObject, SidebarState> {
-  constructor(props: EmptyObject) {
-    super(props);
-
-    this.state = {
-      userFetched: false,
-      profileActive: false,
-      isUpdateNeeded: false,
-      showNewChatDialog: false,
-    };
-
-    store.subscribe(() => {
-      this.setState({ isUpdateNeeded: true });
-    });
-  }
-
-  componentDidMount(): void {
-    Promise.all([authAPI.user(), chatsAPI.list()])
-      .then((data) => {
-        if (data.find(({ status }) => status !== 200)) {
-          const errorMessage = `Errors: ${data.map(({ response }) => JSON.parse(response).reason)}`;
-          throw new Error(errorMessage);
-        }
-        return data.map(({ response }) => JSON.parse(response));
-      })
-      .then(([user, chats]) => {
-        if (!user.id && !this.state.isUpdateNeeded) {
-          router.go('/');
-        } else {
-          store.dispatch({
-            type: 'STORE_USER',
-            payload: user,
-          });
-
-          console.log(chats);
-
-          store.dispatch({
-            type: 'CHATS_LIST',
-            payload: chats,
-          });
-          this.setState({ isUpdateNeeded: true });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        router.go('/');
-      });
-  }
-
+class Sidebar extends Creact.Component<EmptyObject, SidebarState> {
   async signout(): Promise<void> {
     await authAPI.signout();
-    store.dispatch({
-      type: 'STORE_USER',
-      payload: undefined,
-    });
     router.go('/');
   }
 
@@ -87,28 +39,41 @@ export default class Sidebar extends Creact.Component<EmptyObject, SidebarState>
     event.preventDefault();
     const typedTarget = event.currentTarget as HTMLFormElement;
     const values = getFormValues(typedTarget);
-    chatsAPI.newChat(values)
-      .then(({ status, statusText }) => {
-        if (status === 200) {
-          return chatsAPI.list();
-        }
-        throw new Error(statusText);
-      })
-      .then(({ response }) => {
-        const chats = JSON.parse(response);
-        store.dispatch({
-          type: 'CHATS_LIST',
-          payload: chats,
+    const { user } = this.state;
+    if (user?.id) {
+      chatsAPI.newChat(values)
+        .then(({ status, statusText }) => {
+          if (status === 200) {
+            return chatsAPI.list()
+              .then((chats) => {
+                if (user && user?.id) {
+                  const { id: userId } = user;
+                  const payload = chats.map((chatData: ChatData) => new ChatInstance(chatData, userId!));
+                  store.dispatch({
+                    type: 'CHATS_LIST',
+                    payload,
+                  });
+                }
+              })
+              .then(() => this.setState({ showNewChatDialog: false }));
+          }
+          throw new Error(statusText);
         });
+    }
+  };
 
-        this.setState({ showNewChatDialog: false });
-      });
+  searchHandler = (event: Event) => {
+    const currentTarget = event.currentTarget as HTMLInputElement;
+    this.setState({ search: currentTarget?.value ?? '' });
   };
 
   render(): JSX.Element {
-    const { profileActive, showNewChatDialog } = this.state;
-    const { user, chats } = store.state;
-
+    const {
+      user,
+      chats,
+      profileActive,
+      showNewChatDialog,
+    } = this.state;
     return (
       <aside className={styles.root}>
         {!!user && (
@@ -136,37 +101,56 @@ export default class Sidebar extends Creact.Component<EmptyObject, SidebarState>
             </div>
           </div>
         )}
-        <Input name="search" label="Search" type="text" autocomplete="search" />
-        <Button
-          variant="primary"
-          onClick={() => this.setState({ showNewChatDialog: !showNewChatDialog })}
-        >
-          New Chat
-        </Button>
+        <div className={styles.search}>
+          <Input
+            name="search"
+            label="Search"
+            type="text"
+            autocomplete="search"
+            onInput={this.searchHandler}
+          />
+        </div>
+        <div className={styles.newChat}>
+          <Button
+            variant="primary"
+            onClick={() => this.setState({ showNewChatDialog: !showNewChatDialog })}
+          >
+            New Chat
+          </Button>
+          <Modal
+            size="small"
+            heading="New chat"
+            active={showNewChatDialog}
+            onClose={() => this.setState({ showNewChatDialog: !showNewChatDialog })}
+          >
+            <form onSubmit={this.newChat}>
+              <Input name="title" label="Chat title:*" type="text" autocomplete="no" required />
+              <Button
+                variant="primary"
+              >
+                Create
+              </Button>
+            </form>
+          </Modal>
+        </div>
         {profileActive ? (
           <Profile {...user!} />
         ) : (
           <div className={styles.chats}>
-            {chats?.list
-              && chats.list.map((chat: ChatData) => <ChatPreview {...chat} />)}
+            {chats
+              && chats
+                .filter((chat) => (
+                  !this.state.search
+                  || chat.title?.toLowerCase().includes(this.state.search.toLowerCase())))
+                .map((chat) => <ChatPreview chat={chat} />)}
           </div>
         )}
-        <Modal
-          size="small"
-          heading="New chat"
-          active={showNewChatDialog}
-          onClose={() => this.setState({ showNewChatDialog: !showNewChatDialog })}
-        >
-          <form onSubmit={this.newChat}>
-            <Input name="title" label="Chat title:*" type="text" autocomplete="no" required />
-            <Button
-              variant="primary"
-            >
-              Create
-            </Button>
-          </form>
-        </Modal>
       </aside>
     );
   }
 }
+
+export default connect((state) => ({
+  user: state.user,
+  chats: state.chats,
+}))(Sidebar);

@@ -2,9 +2,7 @@
 import { expect } from 'chai';
 import Creact from './index';
 
-import { Component } from './Component';
-
-class Child extends Component {
+class Child extends Creact.Component {
   render(): JSX.Element {
     return (
       <button id="child" onClick={this.props.onClick}>{this.children}</button>
@@ -12,9 +10,11 @@ class Child extends Component {
   }
 }
 
-class Parent extends Component {
+class Parent extends Creact.Component {
   componentDidMount() {
-    this.setState({ loaded: true });
+    if (!this.state.loaded) {
+      this.setState({ loaded: true });
+    }
   }
 
   render(): JSX.Element {
@@ -36,13 +36,22 @@ class Parent extends Component {
   }
 }
 
-describe('Rendered component', () => {
-  Creact.render(<Parent />, document.body);
+let parent: HTMLElement | null;
+let child: HTMLElement | null;
 
-  const parent = document.getElementById('parent');
-  const child = document.getElementById('child');
+describe('Rendered component', () => {
+  before((done) => {
+    Creact.render(<Parent />, document.body);
+    setTimeout(done, 1);
+  });
+
+  after(() => {
+    document.body.innerHTML = '';
+  });
 
   it('should exists', () => {
+    parent = document.getElementById('parent');
+    child = document.getElementById('child');
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(parent).to.not.be.null;
   });

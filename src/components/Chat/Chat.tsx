@@ -1,60 +1,113 @@
 import Creact from '../../core/Creact';
 
-import store from '../../core/store';
-import chatsAPI from '../../core/http/api/chat-api';
+import store, { connect } from '../../core/store';
+import {
+  chatsAPI,
+  ChatInstance,
+  ChatData,
+} from '../../core/http';
 
 import Header from './Header';
 import Controls from './Controls';
+import Modal from '../Modal';
+import Button from '../Button';
+import SearchUsers from './Header/SearchUsers';
 import Message from './Message';
-import type { MessageProps } from './Message';
 
 import * as styles from './Chat.module.pcss';
 
 const chatIcon = new URL('./assets/chat.svg', import.meta.url);
 
-export type ChatData = {
-  id: number;
-  title: string;
-  avatar: string;
-  unread_count: number;
-  last_message: MessageProps;
-  messages: MessageProps[];
+function scrollToBottom(query: string) {
+  const element = document.querySelector(query);
+  if (element) {
+    element.scrollTop = element.scrollHeight - element.clientHeight;
+  }
+}
+
+type ChatState = {
+  user: UserData;
+  chats: ChatInstance[];
+  chat: ChatInstance;
+  showDeleteDialog?: boolean;
+  showAddUserDialog?: boolean;
+  userSearch?: string;
 };
 
-export default class Chat extends Creact.Component<ChatData> {
-  deleteChat(id?: number): void {
+class Chat extends Creact.Component<EmptyObject, ChatState> {
+  async deleteChat(id?: number): Promise<void> {
     if (id) {
-      chatsAPI.deleteChat(id).then(({ response, status, statusText }) => {
-        const res = JSON.parse(response);
-        if (status !== 200) {
-          throw res.reason ?? statusText;
+      await chatsAPI.deleteChat(id);
+      await chatsAPI.list().then((chats) => {
+        const { user } = store.state;
+        if (user && user?.id) {
+          const { id: userId } = user;
+          const payload = chats.map((chatData: ChatData) => new ChatInstance(chatData, userId!));
+          store.dispatch({
+            type: 'CHATS_LIST',
+            payload,
+          });
         }
-        const { id: deletedId } = res;
-        store.dispatch({
-          type: 'CHATS_LIST',
-          payload: store.state.chats?.list?.filter(({ id: chatId }) => chatId === deletedId),
-        });
       });
     }
+    this.setState({
+      showDeleteDialog: false,
+    });
   }
 
   render(): JSX.Element {
-    const { avatar = '' } = store.state.user ?? {};
-    const { title } = this.props;
-    const chat = this.props;
-    console.log(chat);
-    return chat.id ? (
+    const { avatar = '' } = this.state.user ?? {};
+    const chat = this.state.chats.find((item: ChatInstance) => item.active);
+    scrollToBottom(styles.root);
+    return chat?.id ? (
       <section className={styles.root}>
-        <Header id={chat.id} avatar={avatar} title={title!} deleteChat={this.deleteChat} />
-        <main className={styles.messages}>
-          {chat.messages && chat.messages.map((message: MessageProps) => <Message {...message} />)}
+        <Header
+          id={chat.id}
+          avatar={avatar}
+          title={chat.title!}
+          toggle={{
+            addUserDialog: () => this.setState({ showAddUserDialog: true }),
+            deleteChatDialog: () => this.setState({ showDeleteDialog: true }),
+          }} />
+        <main className={styles.messages} id="chat">
+          {chat.messages && chat.messages.map((message) => <Message {...message} />)}
         </main>
-        <Controls />
+        <Controls send={chat.send.bind(chat)} />
+        {this.state.showDeleteDialog && <Modal
+          heading="Delete chat?"
+          active={this.state.showDeleteDialog}
+          size="small"
+          onClose={() => this.setState({ showDeleteDialog: false })}
+        >
+          <h3>Are you sure want to delete this chat?</h3>
+          <Button variant="secondary" onClick={() => this.setState({ showDeleteDialog: false })}>
+            No
+          </Button>
+          <Button variant="primary" onClick={() => this.deleteChat(chat.id!)}>
+            Yes
+          </Button>
+        </Modal>}
+        {this.state.showAddUserDialog && <Modal
+          heading="Add User"
+          active={this.state.showAddUserDialog}
+          size="small"
+          onClose={() => this.setState({ showAddUserDialog: false })}
+        >
+          <SearchUsers chat={chat} />
+          <Button variant="secondary" onClick={() => this.setState({ showAddUserDialog: false })}>
+            Close
+          </Button>
+        </Modal>}
       </section>
     ) : (
       <div className={styles.placeholder}>
-        <img className={styles.img} src={chatIcon} />
+        <img className={styles.img} src={chatIcon} alt="Chat Placeholder image" />
       </div>
     );
   }
 }
+
+export default connect((state) => ({
+  user: state.user,
+  chats: state.chats,
+}))(Chat);

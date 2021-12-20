@@ -25,7 +25,7 @@ export default class Button extends Creact.Component<ButtonProps> {
     return (
       <button
         type={this.props.type}
-        className={`${styles.root} ${styles[String(this.props.variant)]}`}
+        className={`${styles.root} ${styles[this.props.variant]}`}
         onClick={this.props.onClick ?? this.onClick.bind(this)}
       >
         <span>{this.children ?? this.props.label}</span>

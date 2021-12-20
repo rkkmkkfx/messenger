@@ -1,6 +1,6 @@
 import EventBus from '../EventBus';
 import { isEqual } from '../utils';
-import { updateInstance } from './reconciler';
+import { scheduleUpdate } from './reconciler';
 
 export function Fragment(_a: never, ...children: JSX.Element[]): JSX.Element[] {
   return children;
@@ -20,7 +20,7 @@ export abstract class Component<
 
   name = 'Component';
 
-  children?: JSX.Element[];
+  children?: JSX.Element | JSX.Element[] | undefined;
 
   readonly #eventBus: EventBus<State>;
 
@@ -28,8 +28,9 @@ export abstract class Component<
 
   readonly #state: State = {} as State;
 
-  /* ---- INIT ---- */
-  private __internalInstance?: Creact.Instance;
+  __fiber?: Creact.Fiber;
+
+  _rootContainerFiber?: Creact.Fiber;
 
   /**
    * Component constructor
@@ -38,13 +39,14 @@ export abstract class Component<
    * @param children
    * @param parentUpdate
    */
-  protected constructor({ children, ...props }: Props) {
+  constructor({ children, ...props }: Props) {
     this.children = children;
     this.props = props ?? {};
     this.#eventBus = new EventBus();
     this.#state = this.#proxifyState({} as State);
 
     this.#registerEvents(this.#eventBus);
+
     this.#eventBus.emit(Component.EVENTS.INIT);
   }
 
@@ -56,8 +58,8 @@ export abstract class Component<
    */
   #registerEvents(eventBus: EventBus<State>): void {
     eventBus.on(Component.EVENTS.INIT, this.#init.bind(this));
-    eventBus.on(Component.EVENTS.FLOW_CDM, this.#componentDidMount.bind(this));
-    eventBus.on(Component.EVENTS.FLOW_CDU, this.#componentDidUpdate.bind(this));
+    eventBus.on(Component.EVENTS.FLOW_CDM, this.#componentDidMount);
+    eventBus.on(Component.EVENTS.FLOW_CDU, this.#componentDidUpdate);
     eventBus.on(Component.EVENTS.FLOW_RENDER, this.#render.bind(this));
   }
 
@@ -95,7 +97,7 @@ export abstract class Component<
    * Creates component resources and starts the Lifecycle
    */
   #init(): void {
-    this.#eventBus.emit(Component.EVENTS.FLOW_CDM);
+    this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
   }
 
   /* ---- LIFECYCLE ---- */
@@ -103,17 +105,15 @@ export abstract class Component<
   /**
    *
    */
-  #componentDidMount(): void {
-    if (this.componentDidMount) this.componentDidMount();
-    this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
-  }
+  #componentDidMount = async (): Promise<void> => {
+    if (this.componentDidMount) await this.componentDidMount();
+  };
 
   componentDidMount?(): void;
 
   // eslint-disable-next-line class-methods-use-this
-  #shouldUpdate(prevState: State, nextState: State): boolean {
-    return !isEqual(prevState, nextState);
-  }
+  #shouldUpdate = (prevState: State, nextState: State): boolean => (
+    !isEqual(prevState, nextState));
 
   /**
    *
@@ -121,14 +121,14 @@ export abstract class Component<
    * @param nextState
    * @private
    */
-  #componentDidUpdate(prevState: State, nextState: State): void {
+  #componentDidUpdate = async (prevState: State, nextState: State): Promise<void> => {
     const shouldUpdate = this.#shouldUpdate(prevState, nextState);
 
     if (shouldUpdate) {
-      if (this.componentDidUpdate) this.componentDidUpdate(prevState, nextState);
+      if (this.componentDidUpdate) await this.componentDidUpdate(prevState, nextState);
       this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
     }
-  }
+  };
 
   componentDidUpdate?(oldState: State, newState: State): void;
 
@@ -142,16 +142,13 @@ export abstract class Component<
     }
 
     Object.assign(this.state, nextState);
-    if (this.__internalInstance) {
-      updateInstance(this.__internalInstance);
-    }
+    this.#eventBus.emit(Component.EVENTS.FLOW_RENDER);
   };
 
-  #render(): void {
-    if (this.__internalInstance) {
-      updateInstance(this.__internalInstance);
-    }
-  }
+  #render = (): void => {
+    scheduleUpdate(this);
+    this.#eventBus.emit(Component.EVENTS.FLOW_CDM);
+  };
 
   abstract render(): JSX.Element;
 

@@ -15,7 +15,6 @@ export default class Store {
   #state: StoreState;
 
   constructor(initialState: StoreState, reducers: Record<string, Reducer<any>>) {
-    console.log(reducers, initialState);
     this.#listeners = [];
     this.#reducers = reducers;
     this.#state = this.#reduce(initialState, {});
@@ -28,10 +27,12 @@ export default class Store {
   subscribe(fn: (state: StoreState) => void): () => void {
     this.#listeners = [...this.#listeners, fn];
     fn(this.state);
-    return () => { this.#listeners = this.#listeners.filter((sub) => sub !== fn); };
+    return () => {
+      this.#listeners = this.#listeners.filter((sub) => sub !== fn);
+    };
   }
 
-  dispatch(action: Action) {
+  dispatch(action: Action): void {
     this.#state = this.#reduce(this.#state, action);
     this.#listeners.forEach((fn) => fn(this.state));
   }

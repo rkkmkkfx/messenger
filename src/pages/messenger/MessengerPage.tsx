@@ -1,34 +1,56 @@
 import Creact from '../../core/Creact';
 
+import router from '../../core/router';
 import store from '../../core/store';
+
+import {
+  authAPI,
+  ChatInstance,
+  chatsAPI,
+} from '../../core/http';
 
 import Sidebar from '../../components/Sidebar';
 import Chat from '../../components/Chat';
-import type { ChatData } from '../../components/Chat/Chat';
+
+import type { ChatData } from '../../core/http';
 
 import * as styles from './MessengerPage.module.pcss';
 
 export default class MessengerPage extends Creact.Component<EmptyObject, { currentChat?: ChatData }> {
-  componentDidMount(): void {
-    store.subscribe((state) => {
-      if (state.chats) {
-        const { activeId } = state.chats;
-        const currentChat = state.chats.list.find(({ id }: ChatData) => id === activeId);
-        if (state.chats?.list && currentChat) {
-          this.setState({ currentChat });
+  async componentDidMount(): Promise<void> {
+    try {
+      await authAPI.user().then((user) => {
+        if (!user.id) {
+          router.go('/');
         } else {
-          this.setState({ currentChat: undefined });
+          store.dispatch({
+            type: 'STORE_USER',
+            payload: user,
+          });
         }
-      }
-    });
+      });
+      await chatsAPI.list().then((chats) => {
+        const { user } = store.state;
+        if (user && user?.id) {
+          const { id: userId } = user;
+          const payload = chats.map((chatData: ChatData) => new ChatInstance(chatData, userId!));
+          store.dispatch({
+            type: 'CHATS_LIST',
+            payload,
+          });
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      router.go('/');
+    }
   }
 
   render(): JSX.Element {
-    const chat = this.state.currentChat;
     return (
       <section className={styles.root}>
         <Sidebar />
-        <Chat {...chat!} />
+        <Chat />
       </section>
     );
   }

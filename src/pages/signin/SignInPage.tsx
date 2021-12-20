@@ -5,13 +5,13 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import router from '../../core/router';
 
-import store from '../../core/store';
+import { connect } from '../../core/store';
 import auth from '../../core/http/api/auth-api';
 
 import * as styles from './SignInPage.module.pcss';
 import { getFormValues } from '../../core/utils';
 
-export default class SignInPage extends Creact.Component {
+class SignInPage extends Creact.Component {
   submitHandler(event: Event): void {
     event.preventDefault();
     const { currentTarget } = event;
@@ -24,8 +24,8 @@ export default class SignInPage extends Creact.Component {
   }
 
   componentDidMount() {
-    if (store.state.user) {
-      router.go('/messenger');
+    if (this.state.user) {
+      // router.go('/messenger');
     }
   }
 
@@ -68,3 +68,5 @@ export default class SignInPage extends Creact.Component {
     );
   }
 }
+
+export default connect((state) => ({ user: state.user }))(SignInPage);

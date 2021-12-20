@@ -17,6 +17,18 @@ describe('XHR module', function tests() {
     JSON.stringify(data),
   ]);
 
+  let requestBody: Record<string, string>;
+  const postData = { foo: 'bar', data };
+
+  server.respondWith(
+    'POST',
+    '/fake/post/',
+    (request) => {
+      requestBody = JSON.parse(request.requestBody);
+      request.respond(200, { 'Content-Type': 'application/json' }, '{"ok": true}');
+    },
+  );
+
   server.autoRespond = true;
 
   it('should get', async () => {
@@ -30,17 +42,11 @@ describe('XHR module', function tests() {
   });
 
   it('should post', async () => {
-    const postData = { foo: 'bar' };
-    server.respondWith(
-      'POST',
-      '/fake/post/',
-      (request) => {
-        expect(JSON.parse(request.requestBody)).to.be.deep.equal(postData);
-        request.respond(200, { 'Content-Type': 'application/json' }, '{"ok": true}');
-      },
-    );
-
     const { response } = await xhr.post('/fake/post/', postData);
     expect(JSON.parse(response)).to.be.deep.equal({ ok: true });
+  });
+
+  it('should post right data', async () => {
+    expect(requestBody).to.be.deep.equal(postData);
   });
 });
