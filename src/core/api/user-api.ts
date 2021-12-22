@@ -1,4 +1,4 @@
-import HTTPTransport from '../HTTPTransport';
+import HTTPTransport from './HTTPTransport';
 
 const userAPIInstance = new HTTPTransport('https://ya-praktikum.tech/api/v2/user');
 

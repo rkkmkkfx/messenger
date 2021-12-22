@@ -1,7 +1,7 @@
 import Creact from '../../../../core/Creact';
 
-import { userAPI } from '../../../../core/http';
-import type { ChatInstance } from '../../../../core/http';
+import { userAPI } from '../../../../core/api';
+import type { ChatInstance } from '../../../../core/api';
 
 import Input from '../../../Input';
 import IconButton from '../../../IconButton';

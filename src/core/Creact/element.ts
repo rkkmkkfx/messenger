@@ -3,6 +3,12 @@ const createTextElement = (nodeValue: string) => ({
   props: { nodeValue },
 });
 
+/**
+ * JSX parser function
+ * @param type
+ * @param _props
+ * @param rest
+ */
 export default function createElement(
   type: JSX.Tag,
   _props: Creact.DefaultProps,

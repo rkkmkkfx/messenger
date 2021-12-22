@@ -1,7 +1,7 @@
 import Creact from '../../core/Creact';
 
 import store from '../../core/store';
-import { authAPI } from '../../core/http';
+import { authAPI } from '../../core/api';
 
 import Card from '../../components/Card';
 import Input from '../../components/Input';

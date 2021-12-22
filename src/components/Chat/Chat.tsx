@@ -5,7 +5,7 @@ import {
   chatsAPI,
   ChatInstance,
   ChatData,
-} from '../../core/http';
+} from '../../core/api';
 
 import Header from './Header';
 import Controls from './Controls';

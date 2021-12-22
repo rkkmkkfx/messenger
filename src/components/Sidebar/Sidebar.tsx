@@ -8,7 +8,7 @@ import {
   ChatData,
   chatsAPI,
   ChatInstance,
-} from '../../core/http';
+} from '../../core/api';
 
 import { getFormValues } from '../../core/utils';
 

@@ -1,4 +1,4 @@
-import type { ChatInstance } from '../http';
+import type { ChatInstance } from '../api';
 
 const initialState: StoreState = {
   user: undefined,

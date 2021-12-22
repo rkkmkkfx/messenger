@@ -7,12 +7,12 @@ import {
   authAPI,
   ChatInstance,
   chatsAPI,
-} from '../../core/http';
+} from '../../core/api';
 
 import Sidebar from '../../components/Sidebar';
 import Chat from '../../components/Chat';
 
-import type { ChatData } from '../../core/http';
+import type { ChatData } from '../../core/api';
 
 import * as styles from './MessengerPage.module.pcss';
 

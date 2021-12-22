@@ -6,7 +6,7 @@ import Button from '../../components/Button';
 import router from '../../core/router';
 
 import { connect } from '../../core/store';
-import auth from '../../core/http/api/auth-api';
+import auth from '../../core/api/auth-api';
 
 import * as styles from './SignInPage.module.pcss';
 import { getFormValues } from '../../core/utils';
