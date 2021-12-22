@@ -1,3 +1,9 @@
+/**
+ * DOM element props updater
+ * @param {PageElement} _dom - Element
+ * @param {Creact.DefaultProps} prevProps - old props
+ * @param {Creact.DefaultProps} nextProps - new props
+ */
 export function updateDomProps(
   _dom: PageElement,
   prevProps: Creact.DefaultProps,
@@ -42,6 +48,11 @@ export function updateDomProps(
   });
 }
 
+/**
+ * Create DOM element from fiber
+ *
+ * @param fiber
+ */
 export function createDomElement(fiber: Creact.Fiber): HTMLElement | Text {
   const isTextElement = fiber.type === 'TEXT';
   const dom = isTextElement

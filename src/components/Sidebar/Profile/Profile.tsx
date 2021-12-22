@@ -1,6 +1,6 @@
 import Creact from '../../../core/Creact';
 
-import userAPI from '../../../core/http/api/user-api';
+import userAPI from '../../../core/api/user-api';
 
 import Button from '../../Button';
 import Input from '../../Input';

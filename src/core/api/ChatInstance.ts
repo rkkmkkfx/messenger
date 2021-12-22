@@ -1,4 +1,4 @@
-import store from '../../store';
+import store from '../store';
 
 import userAPI from './user-api';
 import chatsAPI from './chat-api';

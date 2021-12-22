@@ -1,6 +1,30 @@
 # Приложение-чат
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4db40759-a3c1-461a-a673-68c5c93a848d/deploy-status)](https://app.netlify.com/sites/praktikum-messenger-rkkmkkfx/deploys)
 
+## Sprint III
+
+### Шаблонизатор
+Следующая ступень эволюции шаблонизатора - теперь это jsx парсер
+и попытка применить react-like механизм сверки
+
+Сделан и доработан по tutorial серии статей [Build Your Own React](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5),
+текущая реализация дополнительно использует EventBus для lifecycle и Proxy для управления состоянием компонента
+
+### Global State
+простейшая реализация redux с initialState, редьюсерами и connect HOC
+
+### Router
+```tsx
+router
+  .use(route, <Component />)
+  .connect(document.getElementById('app'));
+```
+### Client-Server Interaction
+`*-api.ts` - Набор методов для общения с серверной частью приложения.
+
+`ChatInstance.ts` - Instance чата, в котором хранится вся необходимая логика
+
+<!------
 ## Sprint II
 
 #### [Sprint II PR](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/2)
@@ -94,7 +118,6 @@ class Parent extends CreactComponent {
 в несколько файлов. Возможно, в будущем все шаблоны переместятся в компонент(React-like).
 * PostCSS-файл со стилями элемента (`<ElementName>.module.pcss`), если нужен.
 
-<!------
 ## Sprint I
 
 #### [Sprint 1 pull-request](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/1)

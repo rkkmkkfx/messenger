@@ -1,7 +1,7 @@
 import Creact from '../../../core/Creact';
 
 import store from '../../../core/store';
-import { ChatInstance } from '../../../core/http';
+import { ChatInstance } from '../../../core/api';
 
 import * as styles from './ChatPreview.module.pcss';
 
