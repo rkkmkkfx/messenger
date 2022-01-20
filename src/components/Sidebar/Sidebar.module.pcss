@@ -1,27 +1,56 @@
 .root {
-  display: grid;
-  grid-gap: 18px;
-  padding: 16px;
-  min-width: 336px;
-  width: 24vw;
+  display: flex;
+  gap: 18px;
+  flex-direction: column;
   background: var(--surface);
   align-content: start;
+  max-height: 100vh;
+  overflow: scroll;
 
   .user {
     margin: 8px 0;
+    display: flex;
+    padding: 16px;
+    justify-content: space-between;
 
-    .avatar {
+    .userInfo {
       display: flex;
-      width: 72px;
-      height: 72px;
-      overflow: hidden;
-      border-radius: 20px;
-      background-color: var(--surface-dark);
-      border: 2px solid transparent;
+      gap: 16px;
 
-      &:hover {
-        border-color: var(--primary-main);
+      .avatar {
+        display: flex;
+        width: 72px;
+        height: 72px;
+        overflow: hidden;
+        border-radius: 20px;
+        background-color: var(--surface-dark);
+        border: 2px solid transparent;
+
+        &:hover {
+          border-color: var(--primary-main);
+        }
       }
     }
+
+    .userActions {
+      display: flex;
+      gap: 4px;
+    }
   }
+
+  .search {
+    position: sticky;
+    padding: 8px 16px 0;
+    top: 0;
+    background: var(--surface);
+    z-index: 5;
+  }
+
+  .newChat {
+    padding: 0 16px;
+  }
+}
+
+.chats {
+  padding: 16px;
 }

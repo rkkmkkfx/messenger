@@ -1,14 +1,33 @@
+.root {
+  position: relative;
+  width: max-content;
+  max-width: 80%;
+  padding: 8px 16px;
+}
+
 .incoming {
   border-radius: 0 24px 24px 24px;
   background: var(--primary-light);
-  padding: 8px 16px 8px 16px;
-  width: max-content;
+  margin: 8px auto 8px 0;
+
+  .username {
+    left: 0;
+  }
 }
 
 .outgoing {
   background: var(--surface);
-  margin: 32px 0 32px auto;
   border-radius: 24px 24px 0 24px;
-  padding: 8px 16px 8px 16px;
-  width: max-content;
+  margin: 8px 0 8px auto;
+
+  .username {
+    right: 0;
+  }
+}
+
+.username {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 10px;
+  top: -1.5em;
 }

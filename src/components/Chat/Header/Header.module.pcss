@@ -1,10 +1,20 @@
 .root {
+  top: 0;
+  z-index: 2;
   display: grid;
   grid-gap: 16px;
+  position: sticky;
   grid-auto-flow: column;
-  grid-auto-columns: 48px auto;
-  align-content: center;
+  grid-auto-columns: 48px auto 72px;
+  align-items: center;
+  background: #fff;
+  padding: 16px 0;
   border-bottom: 1px solid var(--surface-dark);
+
+  .controls {
+    display: flex;
+    gap: 8px;
+  }
 }
 
 .avatar {
