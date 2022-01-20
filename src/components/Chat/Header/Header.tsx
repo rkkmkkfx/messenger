@@ -6,7 +6,7 @@ import * as styles from './Header.module.pcss';
 
 type HeaderProps = {
   id: number;
-  avatar: string;
+  avatar?: string;
   title: string;
   toggle: {
     addUserDialog: () => void;

@@ -22,11 +22,16 @@ export default class SearchUsers extends Creact.Component<SearchUsersProps, Sear
 
   searchUsers = async (): Promise<void> => {
     if (this.state.userSearch) {
-      const { response } = await userAPI.find({ login: this.state.userSearch });
-      let newSearchResults: UserData[] = JSON.parse(response);
-      newSearchResults = newSearchResults
-        .filter((user) => !!this.props.chat.users.find(({ id }) => id !== user.id));
-      this.setState({ searchResults: newSearchResults });
+      try {
+        const { response } = await userAPI.find({ login: this.state.userSearch });
+        const newSearchResults: UserData[] = JSON.parse(response)
+          .filter((user: UserData) => !!this.props.chat.users.find(({ id }) => id !== user.id));
+        this.setState({ searchResults: newSearchResults });
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        }
+      }
     } else {
       this.setState({ searchResults: [] });
     }
@@ -40,7 +45,6 @@ export default class SearchUsers extends Creact.Component<SearchUsersProps, Sear
         icon={this.isNew(user.id!) ? 'fa fa-plus' : 'fa fa-times'}
         variant="secondary"
         onClick={async () => {
-          console.log(this.isNew(user.id!));
           if (this.isNew(user.id!)) {
             await this.props.chat.addChatUser(user.id!);
             await this.searchUsers();
@@ -63,10 +67,10 @@ export default class SearchUsers extends Creact.Component<SearchUsersProps, Sear
           label="User Login"
           type="text"
           value={this.state.userSearch ?? ''}
-          onInput={async (event: Event) => {
+          onInput={(event: Event) => {
             const typedTarget = event.currentTarget as HTMLInputElement;
             this.setState({ userSearch: typedTarget.value });
-            await this.searchUsers();
+            this.searchUsers();
           }}
         />
         <div className={styles.users}>
