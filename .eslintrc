@@ -14,6 +14,7 @@
     "sourceType": "module" // Allows for the use of imports
   },
   "plugins": [
+    "import",
     "@typescript-eslint"
   ],
   "rules": {
