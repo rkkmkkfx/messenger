@@ -8,8 +8,9 @@ import router from '../../core/router';
 import { connect } from '../../core/store';
 import auth from '../../core/api/auth-api';
 
-import * as styles from './SignInPage.module.pcss';
 import { getFormValues } from '../../core/utils';
+
+import * as styles from './SignInPage.module.pcss';
 
 class SignInPage extends Creact.Component {
   submitHandler(event: Event): void {

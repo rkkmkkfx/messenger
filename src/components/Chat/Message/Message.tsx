@@ -4,12 +4,14 @@ import store from '../../../core/store';
 
 import * as styles from './Message.module.pcss';
 
+const FIRTS_SCREEN_INDEX = 0;
+
 export default class Message extends Creact.Component {
   componentDidMount(): void {
     queueMicrotask(() => {
       const chat = document.querySelector('#chat');
       if (chat && chat.scrollTop === 0) {
-        chat.children[0]?.scrollIntoView();
+        chat.children[FIRTS_SCREEN_INDEX]?.scrollIntoView();
       }
     });
   }

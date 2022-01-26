@@ -38,7 +38,8 @@ export default class Profile extends Creact.Component<UserData> {
           });
         });
         this.setState({ mode: 'view' });
-      });
+      })
+      .catch((e: Error) => console.error(e.message));
   };
 
   updatePassword = ({ currentTarget }: SubmitEvent): void => {

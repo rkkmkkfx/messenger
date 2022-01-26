@@ -16,7 +16,7 @@ import Message from './Message';
 
 import * as styles from './Chat.module.pcss';
 
-const chatIcon = new URL('./assets/chat.svg', import.meta.url);
+import chatIcon from './assets/chat.svg';
 
 function scrollToBottom(query: string) {
   const element = document.querySelector(query);
@@ -36,23 +36,30 @@ type ChatState = {
 
 class Chat extends Creact.Component<EmptyObject, ChatState> {
   async deleteChat(id?: number): Promise<void> {
-    if (id) {
-      await chatsAPI.deleteChat(id);
-      await chatsAPI.list().then((chats) => {
-        const { user } = store.state;
-        if (user && user?.id) {
-          const { id: userId } = user;
-          const payload = chats.map((chatData: ChatData) => new ChatInstance(chatData, userId!));
-          store.dispatch({
-            type: 'CHATS_LIST',
-            payload,
-          });
-        }
+    try {
+      if (id) {
+        await chatsAPI.deleteChat(id);
+        await chatsAPI.list().then((chats) => {
+          const { user } = store.state;
+          if (user && user?.id) {
+            const { id: userId } = user;
+            const payload = chats.map((chatData: ChatData) => new ChatInstance(chatData, userId!));
+            store.dispatch({
+              type: 'CHATS_LIST',
+              payload,
+            });
+          }
+        });
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e.message);
+      }
+    } finally {
+      this.setState({
+        showDeleteDialog: false,
       });
     }
-    this.setState({
-      showDeleteDialog: false,
-    });
   }
 
   render(): JSX.Element {
