@@ -12,7 +12,7 @@ const devServer: DevServerConfiguration = {
   historyApiFallback: true,
 };
 
-const config: Configuration = {
+const clientConfig: Configuration = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
@@ -83,4 +83,19 @@ const config: Configuration = {
   },
 };
 
-export default config;
+const serverConfig = {
+  target: 'node',
+  entry: './src/server/app.ts',
+  mode: process.env.NODE_ENV as Configuration['mode'] ?? 'development',
+  output: {
+    filename: 'server.js',
+    path: path.resolve('dist'),
+    publicPath: '/',
+  },
+  optimization: {
+    minimize: process.env.NODE_ENV === 'production',
+    minimizer: [new TerserPlugin()],
+  },
+};
+
+export default [clientConfig, serverConfig];

@@ -1,0 +1,13 @@
+.idea
+.git
+.github
+static
+dist
+node_modules
+
+.editorconfig
+.gitignore
+.eslintrc
+.mocharc.json
+.stylelintrc
+README.md
