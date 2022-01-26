@@ -7,7 +7,7 @@ import type { Configuration } from 'webpack';
 
 const devServer: DevServerConfiguration = {
   compress: true,
-  port: 1234,
+  port: 3000,
   static: path.join(__dirname, 'dist'),
   historyApiFallback: true,
 };
@@ -42,7 +42,7 @@ const clientConfig: Configuration = {
         loader: 'url-loader',
       },
       {
-        test: /\.tsx?$/,
+        test: /\.ts(x)?$/,
         exclude: /node_modules/,
         use: [
           {

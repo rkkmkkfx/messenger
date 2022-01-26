@@ -1,6 +1,5 @@
 # Приложение-чат
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4db40759-a3c1-461a-a673-68c5c93a848d/deploy-status)](https://app.netlify.com/sites/praktikum-messenger-rkkmkkfx/deploys)
-
+[rkkmkkfx-messenger-praktikum.herokuapp.com](https://rkkmkkfx-messenger-praktikum.herokuapp.com/)
 
 ## Sprint IV
 
