@@ -36,6 +36,7 @@ export const constraints: Record<string, Partial<Constraint>> = {
 
 export function validate({ currentTarget }: Event): string[] {
   const typedTarget = currentTarget as HTMLInputElement;
+
   const { name, validity } = typedTarget;
   const constraintName = name.toLowerCase().includes('password') ? 'password' : name;
   if (constraintName in constraints) {

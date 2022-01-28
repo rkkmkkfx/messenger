@@ -80,6 +80,7 @@ const clientConfig: Configuration = {
     moduleTrace: true,
     orphanModules: true,
     usedExports: true,
+    errorDetails: true,
   },
 };
 

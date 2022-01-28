@@ -13,21 +13,32 @@ import { getFormValues } from '../../core/utils';
 import * as styles from './SignInPage.module.pcss';
 
 class SignInPage extends Creact.Component {
-  submitHandler(event: Event): void {
+  submitHandler = (event: Event): void => {
     event.preventDefault();
     const { currentTarget } = event;
     const typedTarget = currentTarget as HTMLFormElement;
     const credentials = getFormValues(typedTarget);
     auth.signin(credentials)
-      .then(() => {
-        router.go('/messenger');
-      });
-  }
+      .then(({ status, statusText, response }) => {
+        if (status >= 400) {
+          let { reason: message } = JSON.parse(response);
+          if (!message) {
+            message = statusText;
+          }
+          router.go('/error', { status, message });
+        } else {
+          router.go('/messenger');
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   componentDidMount() {
-    if (this.state.user) {
-      // router.go('/messenger');
-    }
+    // auth.user().then((user) => {
+    //   if (user) {
+    //     router.go('/messenger');
+    //   }
+    // });
   }
 
   render(): JSX.Element {

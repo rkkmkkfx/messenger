@@ -44,6 +44,10 @@ export default class Router {
     this.pathname = pathname;
     const route = this.getRoute(pathname);
 
+    if (!route) {
+      this.go('/404', { status: 404, message: 'Page not found' });
+    }
+
     if (this.#currentRoute) {
       this.#currentRoute.leave();
     }
@@ -52,8 +56,8 @@ export default class Router {
     route?.render(this.#root!);
   }
 
-  go(pathname: string): void {
-    this.history?.pushState({}, '', pathname);
+  go(pathname: string, data: Record<string, string | number> = {}): void {
+    this.history?.pushState(data, '', pathname);
     this.#onRoute(pathname);
   }
 
@@ -75,5 +79,9 @@ export default class Router {
 
   set pathname(value: string) {
     this.#pathname = value;
+  }
+
+  get state(): Record<string, string | number> {
+    return this.history?.state;
   }
 }
