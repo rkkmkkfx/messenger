@@ -1,7 +1,11 @@
 # Приложение-чат
-[rkkmkkfx-messenger-praktikum.herokuapp.com](https://rkkmkkfx-messenger-praktikum.herokuapp.com/)
 
-## Sprint IV
+## [Sprint IV PR](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/5)
+
+### [Heroku App](https://rkkmkkfx-messenger-praktikum.herokuapp.com/)
+
+<!------
+## [Sprint III PR](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/3)
 
 ### Webpack
 В `webpack.config.ts` два конфига:
