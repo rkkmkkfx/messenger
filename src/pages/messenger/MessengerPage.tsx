@@ -19,16 +19,18 @@ import * as styles from './MessengerPage.module.pcss';
 export default class MessengerPage extends Creact.Component<EmptyObject, { currentChat?: ChatData }> {
   async componentDidMount(): Promise<void> {
     try {
-      await authAPI.user().then((user) => {
-        if (!user.id) {
-          router.go('/');
-        } else {
-          store.dispatch({
-            type: 'STORE_USER',
-            payload: user,
-          });
-        }
-      });
+      if (!store.state.user) {
+        await authAPI.user().then((user) => {
+          if (!user.id) {
+            router.go('/');
+          } else {
+            store.dispatch({
+              type: 'STORE_USER',
+              payload: user,
+            });
+          }
+        });
+      }
       await chatsAPI.list().then((chats) => {
         const { user } = store.state;
         if (user && user?.id) {

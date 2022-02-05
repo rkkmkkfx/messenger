@@ -101,6 +101,13 @@ export default class Profile extends Creact.Component<UserData> {
                       label="Phone Number"
                       value={user?.phone}
                     />
+                    <Input
+                      name="id"
+                      type="text"
+                      label=""
+                      hidden
+                      value={`${user?.id}`}
+                    />
                   </div>
                   <div className={styles.buttons}>
                     <Button

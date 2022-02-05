@@ -16,7 +16,7 @@ import Message from './Message';
 
 import * as styles from './Chat.module.pcss';
 
-const chatIcon = new URL('./assets/chat.svg', import.meta.url);
+import chatIcon from './assets/chat.svg';
 
 function scrollToBottom(query: string) {
   const element = document.querySelector(query);

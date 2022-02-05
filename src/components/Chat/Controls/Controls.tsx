@@ -24,7 +24,7 @@ export default class Controls extends Creact.Component<ControlsProps> {
       <div className={styles.root}>
         <form onSubmit={this.formHandler} className={styles.form}>
           <IconButton type="button" size="large" icon="fas fa-paperclip" variant="secondary" onClick={console.log} />
-          <Input name="content" label="Type your message here" type="text" autocomplete="off" />
+          <Input name="content" label="Type your message here" type="text" autocomplete="off" required />
           <IconButton size="large" icon="fas fa-paper-plane" variant="primary" type="submit" />
         </form>
       </div>

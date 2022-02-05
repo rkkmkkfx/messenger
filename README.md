@@ -7,7 +7,21 @@
 <!------
 ## [Sprint III PR](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/3)
 
-## Sprint III
+### Webpack
+В `webpack.config.ts` два конфига:
+ * clientConfig - конфиг сборки клиентской части приложения
+ * serverConfig - конфиг сборки серверной части приложения(`src/server/app.ts => dist/server.js`)
+
+Настройки билда зависят от окружения(NODE_ENV)
+
+### Docker
+Multistage build, в первом устанавливаются все зависимости и собирается приложение,
+во втором устанавливаются только production зависимости и копируется билд из первого слоя
+
+
+
+<!------
+## [Sprint III](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/3)
 
 ### Шаблонизатор
 Следующая ступень эволюции шаблонизатора - теперь это jsx парсер
@@ -30,9 +44,7 @@ router
 
 `ChatInstance.ts` - Instance чата, в котором хранится вся необходимая логика
 
-## Sprint II
-
-#### [Sprint II PR](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/2)
+#### [Sprint II](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/2)
 
 ### Второй спринт самостоятельного проекта
 
@@ -123,9 +135,7 @@ class Parent extends CreactComponent {
 в несколько файлов. Возможно, в будущем все шаблоны переместятся в компонент(React-like).
 * PostCSS-файл со стилями элемента (`<ElementName>.module.pcss`), если нужен.
 
-## Sprint I
-
-#### [Sprint 1 pull-request](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/1)
+#### [Sprint I](https://github.com/rkkmkkfx/middle.messenger.praktikum.yandex/pull/1)
 
 ### Первый спринт самостоятельного проекта
 
