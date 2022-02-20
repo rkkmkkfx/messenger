@@ -14068,7 +14068,7 @@ class Route {
         }
     }
     match(pathname) {
-        return isEqual(pathname, this.#pathname);
+        return isEqual(pathname, this.#pathname) || pathname.includes(this.#pathname);
     }
     render(root) {
         this.#root = root;
