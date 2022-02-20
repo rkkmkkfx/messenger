@@ -9,7 +9,7 @@
     "dev": "webpack serve",
     "lint": "stylelint **/*.pcss && tsc --noEmit && eslint src/**/*.ts",
     "build": "webpack",
-    "deploy": "yarn build && touch out/.nojekyll && touch dist/CNAME && echo \"messenger.rkkmkkfx.dev\" >> dist/CNAME",
+    "deploy": "yarn build && touch dist/.nojekyll && touch dist/CNAME && echo \"messenger.rkkmkkfx.dev\" >> dist/CNAME",
     "test": "cross-env TS_NODE_PROJECT=\"tsconfig.test.json\" yarn mocha -r ts-node/register -r jsdom-global/register"
   },
   "engines": {
